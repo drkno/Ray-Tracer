@@ -9,32 +9,32 @@
 #ifndef H_COLOR
 #define H_COLOR
 
-class Color
+class Colour
 {
 
 public:
     float r, g, b;
-	static const Color WHITE;
-	static const Color BLACK;
-	static const Color RED;
-	static const Color GREEN;
-	static const Color BLUE;
-	static const Color GRAY;
+	static const Colour WHITE;
+	static const Colour BLACK;
+	static const Colour RED;
+	static const Colour GREEN;
+	static const Colour BLUE;
+	static const Colour GRAY;
 
-    Color()
+    Colour()
 		: r(1), g(1), b(1)
 	{}	;
 	
-    Color(float rCol, float gCol, float bCol)
+    Colour(float rCol, float gCol, float bCol)
 		: r(rCol), g(gCol), b(bCol)
 	{} ;
 
     void scaleColor(float scaleFactor);
 
-    void combineColor(Color col);
+    void combineColor(Colour col);
 
-    void combineColor(Color col, float scaleFactor);
+    void combineColor(Colour col, float scaleFactor);
 
-	Color phongLight(Color ambientCol, float diffuseTerm,  float specularTerm);
+	Colour phongLight(Colour ambientCol, float diffuseTerm,  float specularTerm);
 };
 #endif

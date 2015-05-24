@@ -12,26 +12,27 @@
 #include "../types/Vector.h"
 #include "Object.h"
 
+#define GRIDX 15
+#define GRIDZ 15
+
 class Plane : public Object
 {
 private:
     Vector a, b, c, d;      //The 4 vertices of a quad
+	Colour colorB;
 
 public:	
 	Plane(void);
-	
-    Plane(Vector pa, Vector pb, Vector pc, Vector pd, Color col)
+    Plane(Vector pa, Vector pb, Vector pc, Vector pd, Colour colA, Colour colB)
 		: a(pa), b(pb), c(pc), d(pd)
 	{
-		color = col;
+		color = colA;
+		colorB = colB;
 	};
-
-	bool isInside(Vector pos);
-	
-	float intersect(Vector pos, Vector dir);
-	
-	Vector normal(Vector pos);
-
+	bool isInside(Vector);
+	float intersect(Vector, Vector);
+	Vector normal(Vector);
+	Colour getColour(Vector);
 };
 
 #endif //!H_PLANE

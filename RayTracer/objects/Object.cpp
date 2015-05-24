@@ -9,12 +9,18 @@
 
 #include "Object.h"
 
-Color Object::getColor()
+Colour Object::getColour()
 {
 	return color;
 }
 
-void Object::setColor(Color col)
+
+Colour Object::getColour(Vector)
+{
+	return color;
+}
+
+void Object::setColor(Colour col)
 {
 	color = col;
 }

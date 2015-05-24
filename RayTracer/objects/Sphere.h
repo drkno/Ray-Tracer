@@ -26,10 +26,10 @@ public:
 	Sphere()
 		: center(Vector()), radius(1)  //Default constructor creates a unit sphere
 	{
-		color = Color::WHITE;
+		color = Colour::WHITE;
 	};
 	
-    Sphere(Vector c, float r, Color col)
+    Sphere(Vector c, float r, Colour col)
 		: center(c), radius(r)
 	{
 		color = col;

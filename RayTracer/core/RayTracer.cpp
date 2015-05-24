@@ -1,27 +1,4 @@
-// ========================================================================
-// COSC 363  Computer Graphics  Lab07
-// A simple ray tracer
-// ========================================================================
-
 #include "RayTracer.h"
-
-using namespace std;
-
-const float WIDTH = 20.0;
-const float HEIGHT = 20.0;
-const float EDIST = 40.0;
-const int PPU = 30;     //Total 600x600 pixels
-const int MAX_STEPS = 5;
-const float XMIN = -WIDTH * 0.5;
-const float XMAX = WIDTH * 0.5;
-const float YMIN = -HEIGHT * 0.5;
-const float YMAX = HEIGHT * 0.5;
-
-vector<Object*> sceneObjects;
-
-Vector light = Vector(10.0, 40.0, -5.0);
-Color backgroundCol = Color::GRAY;
-
 
 /*
 * This function compares the given ray with all objects in the scene
@@ -59,7 +36,7 @@ PointBundle RayTracer::closestPt(Vector pos, Vector dir)
 * have to be traced from the point, by converting this method to a recursive
 * procedure.
 */
-Color RayTracer::trace(Vector pos, Vector dir, int step)
+Colour RayTracer::trace(Vector pos, Vector dir, int step)
 {
 	PointBundle q = closestPt(pos, dir);
 
@@ -70,16 +47,17 @@ Color RayTracer::trace(Vector pos, Vector dir, int step)
 	l.normalise();
 	float lDotn = l.dot(n); //Note ‘l’ is the letter el, not the number 1.
 
-	Color col = sceneObjects[q.index]->getColor(); //Object's colour
+	Colour col = sceneObjects[q.index]->getColour(q.point); //Object's colour
 
 	Vector lightVector = light - q.point;
 	float lightDist = lightVector.length(); //Distance to light
 	lightVector.normalise();
 	PointBundle s = closestPt(q.point, lightVector);
 
-	if (s.index>-1 && s.dist < lightDist)
+	if (s.index > -1 && s.dist < lightDist)
+	{
 		return col.phongLight(backgroundCol, 0.0, 0.0);
-
+	}
 	if (lDotn <= 0)
 	{
 		return col.phongLight(backgroundCol, 0.0, 0.0);
@@ -89,18 +67,16 @@ Color RayTracer::trace(Vector pos, Vector dir, int step)
 	r.normalise();
 	Vector v(-dir.x, -dir.y, -dir.z); //View vector;
 	float rDotv = r.dot(v);
-	float spec;
-	if (rDotv < 0) spec = 0.0;
-	else spec = pow(rDotv, 10); //Phong exponent = 10
+	float spec = rDotv < 0 ? 0.0 : pow(rDotv, 10); //Phong exponent = 10
 
-	Color colorSum = col.phongLight(backgroundCol, lDotn, spec);
+	Colour colorSum = col.phongLight(backgroundCol, lDotn, spec);
 
 	// generate reflection array
 	if (q.index == 0 && step < MAX_STEPS)
 	{
 		float reflCoeff = 0.65;
 		Vector reflectionVector = ((n * 2)*(n.dot(v))) - v;
-		Color reflectionColor = trace(q.point, reflectionVector, step + 1);
+		Colour reflectionColor = trace(q.point, reflectionVector, step + 1);
 		colorSum.combineColor(reflectionColor, reflCoeff);
 	}
 
@@ -137,7 +113,7 @@ void RayTracer::display()
 
 			dir.normalise();			//Normalise this direction
 
-			Color col = trace(eye, dir, 1); //Trace the primary ray and get the colour value
+			Colour col = trace(eye, dir, 1); //Trace the primary ray and get the colour value
 			glColor3f(col.r, col.g, col.b);
 			glVertex2f(x1, y1);				//Draw each pixel with its color value
 			glVertex2f(x1 + pixelSize, y1);
@@ -150,7 +126,6 @@ void RayTracer::display()
 	glFlush();
 }
 
-
 RayTracer::RayTracer()
 {
 	glMatrixMode(GL_PROJECTION);
@@ -159,22 +134,29 @@ RayTracer::RayTracer()
 	glLoadIdentity();
 	glClearColor(0, 0, 0, 1);
 
-	Sphere *sphere1 = new Sphere(Vector(5, 6, -70), 3.0, Color::RED);
-	Sphere *sphere2 = new Sphere(Vector(-5, -6, -80), 15.0, Color::BLUE);
-	Sphere *sphere3 = new Sphere(Vector(12, 12, -70), 4.0, Color::GREEN);
+	Sphere *sphere1 = new Sphere(Vector(5, 6, -70), 3.0, Colour::RED);
+	Sphere *sphere2 = new Sphere(Vector(-5, -6, -80), 10.0, Colour::BLUE);
+	Sphere *sphere3 = new Sphere(Vector(12, 12, -70), 4.0, Colour::GREEN);
 	sceneObjects.push_back(sphere1);
 	sceneObjects.push_back(sphere2);
 	sceneObjects.push_back(sphere3);
 
-	Plane *plane = new Plane(Vector(-10, -10, -40), Vector(10, -10, -40),
-		Vector(10, -10, -80), Vector(-10, -10, -80), Color(1, 0, 1));
+	Cube *cube = new Cube(Vector(9, -3, -60), Vector(12, -6, -70), Colour::GREEN);
+	sceneObjects.push_back(cube);
+
+	Plane *plane = new Plane(Vector(-40, -10, -40), Vector(40, -10, -40),
+		Vector(40, -10, -150), Vector(-40, -10, -150), Colour(1, 0, 1), Colour(0.001, 0, 0));
 	sceneObjects.push_back(plane);
 }
 
-
 RayTracer::~RayTracer()
 {
-	
+	while (!sceneObjects.empty())
+	{
+		auto object = sceneObjects.back();
+		sceneObjects.pop_back();
+		delete object;
+	}
 }
 
 void RayTracer::special(int, int, int)

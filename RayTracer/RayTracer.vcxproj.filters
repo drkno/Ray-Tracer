@@ -36,10 +36,13 @@
     <ClCompile Include="core\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="types\Color.cpp">
+    <ClCompile Include="types\Vector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="types\Vector.cpp">
+    <ClCompile Include="objects\Cube.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="types\Colour.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -59,13 +62,16 @@
     <ClInclude Include="objects\Sphere.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="types\Color.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="types\Vector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="types\PointBundle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="objects\Cube.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="types\Colour.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

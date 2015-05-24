@@ -13,19 +13,20 @@
 #define H_OBJECT
 
 #include "../types/Vector.h"
-#include "../types/Color.h"
+#include "../types/Colour.h"
 
 class Object 
 {
 protected:
-	Color color;
+	Colour color;
 public:
 	Object() {}
     virtual float intersect(Vector pos, Vector dir) = 0;
 	virtual Vector normal(Vector pos) = 0;
 	virtual ~Object() {}
-	Color getColor();
-	void setColor(Color col);
+	virtual Colour getColour();
+	virtual Colour getColour(Vector);
+	void setColor(Colour col);
 };
 
 #endif
