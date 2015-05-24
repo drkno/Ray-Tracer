@@ -69,19 +69,24 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Color.cpp" />
-    <ClCompile Include="Object.cpp" />
-    <ClCompile Include="Plane.cpp" />
-    <ClCompile Include="RayTracer.cpp" />
-    <ClCompile Include="Sphere.cpp" />
-    <ClCompile Include="Vector.cpp" />
+    <ClCompile Include="core\main.cpp" />
+    <ClCompile Include="types\Color.cpp" />
+    <ClCompile Include="core\RayTracer.cpp" />
+    <ClCompile Include="objects\Object.cpp" />
+    <ClCompile Include="core\OpenGLManager.cpp" />
+    <ClCompile Include="objects\Plane.cpp" />
+    <ClCompile Include="objects\Sphere.cpp" />
+    <ClCompile Include="types\Vector.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Color.h" />
-    <ClInclude Include="Object.h" />
-    <ClInclude Include="Plane.h" />
-    <ClInclude Include="Sphere.h" />
-    <ClInclude Include="Vector.h" />
+    <ClInclude Include="types\Color.h" />
+    <ClInclude Include="core\RayTracer.h" />
+    <ClInclude Include="objects\Object.h" />
+    <ClInclude Include="core\OpenGLManager.h" />
+    <ClInclude Include="objects\Plane.h" />
+    <ClInclude Include="objects\Sphere.h" />
+    <ClInclude Include="types\PointBundle.h" />
+    <ClInclude Include="types\Vector.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

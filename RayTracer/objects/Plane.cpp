@@ -7,7 +7,7 @@
 -------------------------------------------------------------*/
 
 #include "Plane.h"
-#include "Vector.h"
+#include "../types/Vector.h"
 #include <math.h>
 
 //Function to test if an input point is within the quad.

@@ -12,8 +12,8 @@
 #ifndef H_OBJECT
 #define H_OBJECT
 
-#include "Vector.h"
-#include "Color.h"
+#include "../types/Vector.h"
+#include "../types/Color.h"
 
 class Object 
 {

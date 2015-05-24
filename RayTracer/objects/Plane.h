@@ -9,7 +9,7 @@
 #ifndef H_PLANE
 #define H_PLANE
 
-#include "Vector.h"
+#include "../types/Vector.h"
 #include "Object.h"
 
 class Plane : public Object
