@@ -71,6 +71,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="objects\ChequeredFloor.cpp" />
     <ClCompile Include="core\main.cpp" />
     <ClCompile Include="objects\Cube.cpp" />
     <ClCompile Include="types\Colour.cpp" />
@@ -82,6 +83,7 @@
     <ClCompile Include="types\Vector.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="objects\ChequeredFloor.h" />
     <ClInclude Include="objects\Cube.h" />
     <ClInclude Include="types\Colour.h" />
     <ClInclude Include="core\RayTracer.h" />

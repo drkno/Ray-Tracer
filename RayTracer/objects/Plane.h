@@ -17,22 +17,19 @@
 
 class Plane : public Object
 {
-private:
+protected:
     Vector a, b, c, d;      //The 4 vertices of a quad
-	Colour colorB;
 
 public:	
 	Plane(void);
-    Plane(Vector pa, Vector pb, Vector pc, Vector pd, Colour colA, Colour colB)
+    Plane(Vector pa, Vector pb, Vector pc, Vector pd, Colour col)
 		: a(pa), b(pb), c(pc), d(pd)
 	{
-		color = colA;
-		colorB = colB;
+		color = col;
 	};
 	bool isInside(Vector);
 	float intersect(Vector, Vector);
 	Vector normal(Vector);
-	Colour getColour(Vector);
 };
 
 #endif //!H_PLANE
