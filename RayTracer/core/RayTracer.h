@@ -12,6 +12,8 @@
 #include "../objects/Plane.h"
 #include "../objects/Cube.h"
 #include "../objects/ChequeredFloor.h"
+#include "../objects/ProcedualSphere.h"
+#include "../objects/ImageSphere.h"
 
 #include "../types/Colour.h"
 #include "../types/Vector.h"

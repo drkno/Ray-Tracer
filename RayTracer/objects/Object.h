@@ -31,10 +31,10 @@ public:
 	void setColor(Colour col);
 	float getRefractiveIndex();
 	void setRefractiveIndex(float);
-	bool isRefractive();
+	virtual bool isRefractive();
 	float getReflectiveness();
 	void setReflectiveness(float);
-	bool isReflective();
+	virtual bool isReflective();
 };
 
 #endif

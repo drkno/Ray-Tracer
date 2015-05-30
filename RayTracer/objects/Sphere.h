@@ -1,13 +1,4 @@
-/*----------------------------------------------------------
-* COSC363  Ray Tracer
-*
-*  The sphere class
-*  This is a subclass of Object, and hence implements the
-*  methods intersect() and normal().
--------------------------------------------------------------*/
-
-#ifndef H_SPHERE
-#define H_SPHERE
+#pragma once
 
 #include "Object.h"
 
@@ -17,28 +8,13 @@
  */
 class Sphere : public Object
 {
-
 private:
     Vector center;
     float radius;
 
-public:	
-	Sphere()
-		: center(Vector()), radius(1)  //Default constructor creates a unit sphere
-	{
-		color = Colour::WHITE;
-	};
-	
-    Sphere(Vector c, float r, Colour col)
-		: center(c), radius(r)
-	{
-		color = col;
-	};
-
-	float intersect(Vector pos, Vector dir);
-
-	Vector normal(Vector p);
-
+public:
+	Sphere();
+	Sphere(Vector c, float r, Colour col);
+	float intersect(Vector pos, Vector dir) override;
+	Vector normal(Vector p) override;
 };
-
-#endif //!H_SPHERE

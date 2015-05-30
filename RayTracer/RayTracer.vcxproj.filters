@@ -16,6 +16,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="textures\Moon.raw" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="core\OpenGLManager.cpp">
@@ -46,6 +47,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="objects\ChequeredFloor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="textures\loadRAW.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\TexturedSphere.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\ProcedualSphere.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\ImageSphere.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -81,6 +94,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="core\AntiAliasManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="textures\loadRAW.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="objects\TexturedSphere.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="objects\ProcedualSphere.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="objects\ImageSphere.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

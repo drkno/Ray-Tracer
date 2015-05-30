@@ -211,12 +211,20 @@ RayTracer::RayTracer()
 	sceneObjects.push_back(sphere2);
 	sceneObjects.push_back(sphere3);
 
+	
+
 	Cube* cube = new Cube(Vector(9, -3, -60), Vector(12, -6, -70), Colour::GREEN);
 	sceneObjects.push_back(cube);
 
 	auto plane = new ChequeredFloor(Vector(-300, -10, 300), Vector(300, -10, 300),
 	                         Vector(300, -10, -150), Vector(-300, -10, -150), Colour::WHITE, Colour::BLACK);
 	sceneObjects.push_back(plane);
+
+	ProcedualSphere *procedual = new ProcedualSphere(Vector(0, 0, -30), 5.0);
+	sceneObjects.push_back(procedual);
+
+	ImageSphere *imageSphere = new ImageSphere(Vector(0, 15, -70), 5.0, "Moon.raw", 256, 128);
+	sceneObjects.push_back(imageSphere);
 }
 
 RayTracer::~RayTracer()

@@ -9,6 +9,16 @@
 #include "Sphere.h"
 #include <math.h>
 
+Sphere::Sphere(): center(Vector()), radius(1)
+{
+	color = Colour::WHITE;
+}
+
+Sphere::Sphere(Vector c, float r, Colour col): center(c), radius(r)
+{
+	color = col;
+}
+
 /**
 * Sphere's intersection method.  The input is a ray (pos, dir). 
 */
