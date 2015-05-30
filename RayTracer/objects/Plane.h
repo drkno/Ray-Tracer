@@ -12,9 +12,6 @@
 #include "../types/Vector.h"
 #include "Object.h"
 
-#define GRIDX 15
-#define GRIDZ 15
-
 class Plane : public Object
 {
 protected:

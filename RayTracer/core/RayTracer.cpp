@@ -1,5 +1,4 @@
 #include "RayTracer.h"
-#include "../objects/ChequeredFloor.h"
 
 /*
 * This function compares the given ray with all objects in the scene
@@ -69,16 +68,23 @@ Colour RayTracer::trace(Vector pos, Vector dir, int step)
 	Colour colorSum = col.phongLight(backgroundCol, lDotn, spec);
 
 	// generate reflection array
-	if (q.index == 0 && step < MAX_STEPS)
+	if (sceneObjects[q.index]->isReflective() && step < MAX_STEPS)
 	{
-		float reflCoeff = 0.65;
+		float reflCoeff = sceneObjects[q.index]->getReflectiveness();
 		Vector reflectionVector = ((n * 2) * (n.dot(v))) - v;
 		Colour reflectionColor = trace(q.point, reflectionVector, step + 1);
-		colorSum.combineColor(reflectionColor, reflCoeff);
+		if (reflCoeff == 1)
+		{
+			colorSum = reflectionColor.phongLight(backgroundCol, lDotn, spec);
+		}
+		else
+		{
+			colorSum.combineColor(reflectionColor, reflCoeff);
+		}
 	}
-	else if (q.index == 2 && step < MAX_STEPS)
+	else if (sceneObjects[q.index]->isRefractive() && step < MAX_STEPS)
 	{
-		float refractionCoeff = 1.3358;
+		float refractionCoeff = 1.9;//sceneObjects[q.index]->getRefractiveIndex();
 		float nDotV = n.dot(v);
 
 		float k = 1 - powf(refractionCoeff, 2) * (1 - powf(nDotV, 2));
@@ -89,13 +95,17 @@ Colour RayTracer::trace(Vector pos, Vector dir, int step)
 		}
 		else
 		{
-			v.scale(refractionCoeff);
-			n.scale(refractionCoeff * nDotV + sqrtf(k));
-			refractionVector = v - n;
+			Vector a = v, b = n;
+			a.scale(refractionCoeff);
+			b.scale(refractionCoeff * nDotV + sqrtf(k));
+			refractionVector = a - b;
 		}
 
-		Colour refractionColour = trace(q.point, refractionVector, step + 1);
-		colorSum.combineColor(refractionColour, 0.9);
+		auto otherSide = closestPt(q.point, refractionVector);
+
+		Colour refractionColour = trace(otherSide.point, dir, step + 1);
+		//refractionColour.combineColor(colorSum, 0.50);
+		colorSum = refractionColour;
 	}
 
 	return colorSum;
@@ -107,12 +117,9 @@ Colour RayTracer::trace(Vector pos, Vector dir, int step)
 //---------------------------------------------------------------------------------------
 void RayTracer::display()
 {
-	int widthInPixels = (int)(WIDTH * PPU);
-	int heightInPixels = (int)(HEIGHT * PPU);
-	float pixelSize = 1.0 / PPU;
-	float halfPixelSize = pixelSize / 2.0;
-	float x1, y1, xc, yc;
-	Vector eye(0., 0., 0.);
+	int widthInPixels = WIDTH * PPU;
+	int heightInPixels = HEIGHT * PPU;
+	float x1, y1;
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -121,27 +128,68 @@ void RayTracer::display()
 	for (int i = 0; i < widthInPixels; i++) //Scan every "pixel"
 	{
 		x1 = XMIN + i * pixelSize;
-		xc = x1 + halfPixelSize;
 		for (int j = 0; j < heightInPixels; j++)
 		{
 			y1 = YMIN + j * pixelSize;
-			yc = y1 + halfPixelSize;
-
-			Vector dir(xc, yc, -EDIST); //direction of the primary ray
-
-			dir.normalise(); //Normalise this direction
-
-			Colour col = trace(eye, dir, 1); //Trace the primary ray and get the colour value
-			glColor3f(col.r, col.g, col.b);
-			glVertex2f(x1, y1); //Draw each pixel with its color value
-			glVertex2f(x1 + pixelSize, y1);
-			glVertex2f(x1 + pixelSize, y1 + pixelSize);
-			glVertex2f(x1, y1 + pixelSize);
+			drawPixel(x1, y1);
 		}
 	}
 
 	glEnd();
 	glFlush();
+	std::cout << "display" << std::endl;
+}
+
+void RayTracer::outputPixel(Colour *col, float *x, float *y)
+{
+	glColor3f(col->r, col->g, col->b);
+	glVertex2f(*x, *y); //Draw each pixel with its color value
+	glVertex2f(*x + pixelSize, *y);
+	glVertex2f(*x + pixelSize, *y + pixelSize);
+	glVertex2f(*x, *y + pixelSize);
+}
+
+Colour RayTracer::getColourNone(float *x, float *y, float *halfSize)
+{
+	float xc = *x + *halfSize;
+	float yc = *y + *halfSize;
+	Vector dir(xc, yc, -EDIST); //direction of the primary ray
+	dir.normalise(); //Normalise this direction
+	return trace(eye, dir, 1); //Trace the primary ray and get the colour value
+}
+
+Colour RayTracer::getColourSupersample(float *x, float *y)
+{
+	vector<Colour> colours;
+	for (int i = 0; i < samplingLevel; i++)
+	{
+		float yPos = *y + 2.0 * halfSupersamplePixelSize;
+		for (int j = 0; j < samplingLevel; j++)
+		{
+			float xPos = *x + 2.0 * halfSupersamplePixelSize;
+			colours.push_back(getColourNone(&xPos, &yPos, &halfSupersamplePixelSize));
+		}
+	}
+	Colour col = colours[colours.size() - 1];
+	colours.pop_back();
+	return col.average(colours);
+}
+
+void RayTracer::drawPixel(float x, float y)
+{
+	Colour colour;
+	switch (type)
+	{
+	default:
+	case None:
+	{
+		colour = getColourNone(&x, &y, &halfPixelSize);
+		break;
+	}
+	case Supersample: colour = getColourSupersample(&x, &y); break;
+	}
+
+	outputPixel(&colour, &x, &y);
 }
 
 RayTracer::RayTracer()
@@ -153,8 +201,12 @@ RayTracer::RayTracer()
 	glClearColor(0, 0, 0, 1);
 
 	Sphere* sphere1 = new Sphere(Vector(5, 6, -70), 3.0, Colour::RED);
+	//sphere1->setReflectiveness(1);
 	Sphere* sphere2 = new Sphere(Vector(-5, -6, -80), 10.0, Colour::BLUE);
-	Sphere* sphere3 = new Sphere(Vector(12, 12, -70), 4.0, Colour::GREEN);
+	Sphere* sphere3 = new Sphere(Vector(5, -5, -60), 4.0, Colour::WHITE);
+	//sphere3->setRefractiveIndex(0.8);
+	sphere3->setReflectiveness(1);
+
 	sceneObjects.push_back(sphere1);
 	sceneObjects.push_back(sphere2);
 	sceneObjects.push_back(sphere3);
@@ -162,8 +214,8 @@ RayTracer::RayTracer()
 	Cube* cube = new Cube(Vector(9, -3, -60), Vector(12, -6, -70), Colour::GREEN);
 	sceneObjects.push_back(cube);
 
-	auto plane = new ChequeredFloor(Vector(-40, -10, -40), Vector(40, -10, -40),
-	                         Vector(40, -10, -150), Vector(-40, -10, -150), Colour(1, 0, 1), Colour(0.001, 0, 0));
+	auto plane = new ChequeredFloor(Vector(-300, -10, 300), Vector(300, -10, 300),
+	                         Vector(300, -10, -150), Vector(-300, -10, -150), Colour::WHITE, Colour::BLACK);
 	sceneObjects.push_back(plane);
 }
 
@@ -181,6 +233,13 @@ void RayTracer::special(int, int, int)
 {
 }
 
-void RayTracer::key(unsigned char, int, int)
+void RayTracer::key(unsigned char key, int, int)
 {
+	if (key == 'a')
+	{
+		int aaType = type;
+		type = static_cast<AntiAliasType>((aaType + 1) % 2);
+	}
+	std::cout << type << std::endl;
+	glutPostRedisplay();
 }

@@ -5,11 +5,13 @@
 #include <vector>
 #include <GL/glut.h>
 #include <GL/freeglut.h>
+#include "AntiAliasManager.h"
 
 #include "../objects/Object.h"
 #include "../objects/Sphere.h"
 #include "../objects/Plane.h"
 #include "../objects/Cube.h"
+#include "../objects/ChequeredFloor.h"
 
 #include "../types/Colour.h"
 #include "../types/Vector.h"
@@ -28,6 +30,7 @@ public:
 	void display();
 	void special(int, int, int);
 	void key(unsigned char, int, int);
+	Colour trace(Vector pos, Vector dir, int step);
 
 private:
 	// Private Constant Variables
@@ -45,9 +48,18 @@ private:
 	vector<Object*> sceneObjects;
 	Vector light = Vector(10.0, 40.0, -5.0);
 	Colour backgroundCol = Colour::GRAY;
+	AntiAliasType type = AntiAliasType::None;
+	float pixelSize = 1.0 / PPU;
+	Vector eye = Vector(0., 0., 0.);
+	float halfPixelSize = pixelSize / 2.0;
+	float samplingLevel = 2;
+	float halfSupersamplePixelSize = (pixelSize / samplingLevel) / 2.0;
 
 	// Private Methods
 	PointBundle closestPt(Vector pos, Vector dir);
-	Colour trace(Vector pos, Vector dir, int step);
+	void drawPixel(float x, float y);
+	Colour getColourSupersample(float *x, float *y);
+	Colour getColourNone(float *x, float *y, float *halfSize);
+	void outputPixel(Colour *col, float *x, float *y);
 };
 

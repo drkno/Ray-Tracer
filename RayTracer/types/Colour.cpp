@@ -47,6 +47,24 @@ Colour Colour::phongLight(Colour ambientCol, float diffTerm, float specTerm)
 	return col;
 }
 
+Colour Colour::average(std::vector<Colour> colours)
+{
+	Colour col;
+	col.r = this->r;
+	col.g = this->g;
+	col.b = this->b;
+	for (int i = 0; i < colours.size(); i++)
+	{
+		col.r += colours[i].r;
+		col.g += colours[i].g;
+		col.b += colours[i].b;
+	}
+	col.r /= colours.size();
+	col.g /= colours.size();
+	col.b /= colours.size();
+	return col;
+}
+
 const Colour Colour::WHITE = Colour(1, 1, 1);
 const Colour Colour::BLACK = Colour(0, 0, 0);
 const Colour Colour::RED = Colour(1, 0, 0);

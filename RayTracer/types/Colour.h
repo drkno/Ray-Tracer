@@ -8,6 +8,7 @@
 
 #ifndef H_COLOR
 #define H_COLOR
+#include <vector>
 
 class Colour
 {
@@ -36,5 +37,7 @@ public:
     void combineColor(Colour col, float scaleFactor);
 
 	Colour phongLight(Colour ambientCol, float diffuseTerm,  float specularTerm);
+
+	Colour average(std::vector<Colour> colours);
 };
 #endif

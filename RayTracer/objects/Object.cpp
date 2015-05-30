@@ -24,3 +24,34 @@ void Object::setColor(Colour col)
 {
 	color = col;
 }
+
+float Object::getRefractiveIndex()
+{
+	return refractiveIndex;
+}
+
+
+void Object::setRefractiveIndex(float index)
+{
+	refractiveIndex = index;
+}
+
+bool Object::isRefractive()
+{
+	return refractiveIndex > 0;
+}
+
+float Object::getReflectiveness()
+{
+	return reflectiveness;
+}
+
+void Object::setReflectiveness(float reflectiveness)
+{
+	this->reflectiveness = reflectiveness;
+}
+
+bool Object::isReflective()
+{
+	return reflectiveness > 0;
+}

@@ -83,6 +83,7 @@
     <ClCompile Include="types\Vector.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="core\AntiAliasManager.h" />
     <ClInclude Include="objects\ChequeredFloor.h" />
     <ClInclude Include="objects\Cube.h" />
     <ClInclude Include="types\Colour.h" />

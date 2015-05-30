@@ -19,6 +19,8 @@ class Object
 {
 protected:
 	Colour color;
+	float refractiveIndex = -1;
+	float reflectiveness = -1;
 public:
 	Object() {}
     virtual float intersect(Vector pos, Vector dir) = 0;
@@ -27,6 +29,12 @@ public:
 	virtual Colour getColour();
 	virtual Colour getColour(Vector);
 	void setColor(Colour col);
+	float getRefractiveIndex();
+	void setRefractiveIndex(float);
+	bool isRefractive();
+	float getReflectiveness();
+	void setReflectiveness(float);
+	bool isReflective();
 };
 
 #endif
