@@ -58,6 +58,9 @@ private:
 	vector<Object*> sceneObjects;
 	Vector light = Vector(10.0, 40.0, -5.0);
 	Colour backgroundCol = Colour::GRAY;
+	Colour fogColour = Colour::WHITE;
+	int fogStart = 80;
+	int fogEnd = 120;
 	AntiAliasType type = AntiAliasType::None;
 	float pixelSize = 1.0 / PPU;
 	Vector eye = Vector(0., 0., 0.);
@@ -65,6 +68,7 @@ private:
 	float samplingLevel = 2;
 	float halfSupersamplePixelSize = (pixelSize / samplingLevel) / 2.0;
 	float edist = 40.0;
+	float fogProgression;
 
 	// Private Methods
 	PointBundle closestPt(Vector pos, Vector dir);

@@ -72,6 +72,7 @@
     <None Include="textures\Moon.raw" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="objects\Cylinder.cpp" />
     <ClCompile Include="objects\ImageSphere.cpp" />
     <ClCompile Include="objects\ChequeredFloor.cpp" />
     <ClCompile Include="core\main.cpp" />
@@ -89,6 +90,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core\AntiAliasManager.h" />
+    <ClInclude Include="objects\Cylinder.h" />
     <ClInclude Include="objects\ImageSphere.h" />
     <ClInclude Include="objects\ChequeredFloor.h" />
     <ClInclude Include="objects\Cube.h" />

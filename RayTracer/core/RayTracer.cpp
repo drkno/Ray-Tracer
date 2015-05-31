@@ -1,4 +1,5 @@
 #include "RayTracer.h"
+#include "../objects/Cylinder.h"
 
 /*
 * This function compares the given ray with all objects in the scene
@@ -39,6 +40,10 @@ PointBundle RayTracer::closestPt(Vector pos, Vector dir)
 Colour RayTracer::trace(Vector pos, Vector dir, int step)
 {
 	auto q = closestPt(pos, dir);
+
+	/*float fogAmount = fogProgression * (q.dist - fogStart);
+	Colour background = backgroundCol;
+	backgroundCol.combineColor(fogColourfogProgression);*/
 
 	if (q.index == -1) return backgroundCol; //no intersection
 
@@ -265,18 +270,19 @@ void RayTracer::drawPixel(float x, float y)
 
 RayTracer::RayTracer()
 {
+	fogProgression = 0.5 / (fogEnd - fogStart);
+
 	glMatrixMode(GL_PROJECTION);
 	gluOrtho2D(XMIN, XMAX, YMIN, YMAX);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glClearColor(0, 0, 0, 1);
 
-	Sphere* sphere1 = new Sphere(Vector(5, 6, -70), 3.0, Colour::RED);
-	//sphere1->setReflectiveness(1);
+	Sphere* sphere1 = new Sphere(Vector(0, 0, -40), 3.0, Colour::RED);
+	sphere1->setRefractiveIndex(0.01);
 	Sphere* sphere2 = new Sphere(Vector(-10, 6, -100), 4.0, Colour::GREEN);
 	sphere2->setReflectiveness(1);
 	Sphere* sphere3 = new Sphere(Vector(5, 0, -100), 10.0, Colour::BLUE);
-	//sphere3->setRefractiveIndex(0.8);
 	sphere3->setReflectiveness(0.65);
 
 	sceneObjects.push_back(sphere1);
@@ -297,6 +303,9 @@ RayTracer::RayTracer()
 
 	ImageSphere *imageSphere = new ImageSphere(Vector(0, 15, -70), 5.0, "Moon.raw", 256, 128);
 	sceneObjects.push_back(imageSphere);
+
+	Cylinder *cylinder = new Cylinder(Vector(0, -5, -50), 3, 2.5, Colour::RED);
+	sceneObjects.push_back(cylinder);
 }
 
 RayTracer::~RayTracer()
