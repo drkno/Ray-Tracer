@@ -72,6 +72,7 @@
     <None Include="textures\Moon.raw" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="objects\Cone.cpp" />
     <ClCompile Include="objects\Cylinder.cpp" />
     <ClCompile Include="objects\ImageSphere.cpp" />
     <ClCompile Include="objects\ChequeredFloor.cpp" />
@@ -89,6 +90,7 @@
     <ClCompile Include="types\Vector.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="objects\Cone.h" />
     <ClInclude Include="core\AntiAliasManager.h" />
     <ClInclude Include="objects\Cylinder.h" />
     <ClInclude Include="objects\ImageSphere.h" />

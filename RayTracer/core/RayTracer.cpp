@@ -1,5 +1,6 @@
 #include "RayTracer.h"
 #include "../objects/Cylinder.h"
+#include "../objects/Cone.h"
 
 /*
 * This function compares the given ray with all objects in the scene
@@ -81,30 +82,20 @@ Colour RayTracer::trace(Vector pos, Vector dir, int step)
 		colourSum = col.phongLight(backgroundCol, lDotn, spec);
 	}
 
-	// generate reflection array
-	if (sceneObjects[q.index]->isReflective() && step < MAX_STEPS)
+	bool shouldReflect = false;
+	if (sceneObjects[q.index]->isRefractive() && step < MAX_STEPS)
 	{
-		float reflCoeff = sceneObjects[q.index]->getReflectiveness();
-		Vector reflectionVector = ((n * 2) * (n.dot(v))) - v;
-		Colour reflectionColor = trace(q.point, reflectionVector, step + 1);
-		if (reflCoeff == 1)
-		{
-			colourSum = reflectionColor.phongLight(backgroundCol, lDotn, spec);
-		}
-		else
-		{
-			colourSum.combineColor(reflectionColor, reflCoeff);
-		}
-	}
-	else if (sceneObjects[q.index]->isRefractive() && step < MAX_STEPS)
-	{
-		float refractionCoeff = 1.9;//sceneObjects[q.index]->getRefractiveIndex();
+		const float airRatio = 1.0f;
+
+
+		float refractionCoeff = sceneObjects[q.index]->getRefractiveIndex();
 		float nDotV = n.dot(v);
 
 		float k = 1 - powf(refractionCoeff, 2) * (1 - powf(nDotV, 2));
 		Vector refractionVector;
 		if (k < 0.f)
 		{
+			shouldReflect = true;
 			refractionVector = Vector(0, 0, 0);
 		}
 		else
@@ -120,6 +111,22 @@ Colour RayTracer::trace(Vector pos, Vector dir, int step)
 		Colour refractionColour = trace(otherSide.point, dir, step + 1);
 		//refractionColour.combineColor(colorSum, 0.50);
 		colourSum = refractionColour;
+	}
+
+	// generate reflection ray
+	if (shouldReflect || sceneObjects[q.index]->isReflective() && step < MAX_STEPS)
+	{
+		float reflCoeff = shouldReflect ? 1 : sceneObjects[q.index]->getReflectiveness();
+		Vector reflectionVector = ((n * 2) * (n.dot(v))) - v;
+		Colour reflectionColor = trace(q.point, reflectionVector, step + 1);
+		if (reflCoeff == 1)
+		{
+			colourSum = reflectionColor.phongLight(backgroundCol, lDotn, spec);
+		}
+		else
+		{
+			colourSum.combineColor(reflectionColor, reflCoeff);
+		}
 	}
 
 	return colourSum;
@@ -278,14 +285,14 @@ RayTracer::RayTracer()
 	glLoadIdentity();
 	glClearColor(0, 0, 0, 1);
 
-	Sphere* sphere1 = new Sphere(Vector(0, 0, -40), 3.0, Colour::RED);
-	sphere1->setRefractiveIndex(0.01);
+	//Sphere* sphere1 = new Sphere(Vector(0, 0, -40), 3.0, Colour::RED);
+	//sphere1->setRefractiveIndex(0.8);
 	Sphere* sphere2 = new Sphere(Vector(-10, 6, -100), 4.0, Colour::GREEN);
 	sphere2->setReflectiveness(1);
 	Sphere* sphere3 = new Sphere(Vector(5, 0, -100), 10.0, Colour::BLUE);
 	sphere3->setReflectiveness(0.65);
 
-	sceneObjects.push_back(sphere1);
+	//sceneObjects.push_back(sphere1);
 	sceneObjects.push_back(sphere2);
 	sceneObjects.push_back(sphere3);
 
@@ -306,6 +313,10 @@ RayTracer::RayTracer()
 
 	Cylinder *cylinder = new Cylinder(Vector(0, -5, -50), 3, 2.5, Colour::RED);
 	sceneObjects.push_back(cylinder);
+
+	Cone *cone = new Cone(Vector(0, 0, -30), 6, 3, Colour::GREEN);
+	sceneObjects.push_back(cone);
+
 }
 
 RayTracer::~RayTracer()
