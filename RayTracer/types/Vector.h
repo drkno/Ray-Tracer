@@ -25,6 +25,7 @@ public:
     const Vector& operator/=(float scale);
 
     Vector operator/(float scale) const;
+	Vector operator/(const Vector other);
 
     const Vector& operator+=(const Vector rhs);
 

@@ -14,13 +14,14 @@ using namespace std;
 class Cube : public Object
 {
 private:
-	float xmin, xmax, ymin, ymax, zmin, zmax;
-	//Vector firstCorner, secondCorner;
+	Vector minVector;
+	Vector maxVector;
+	Vector center;
 
 public:
-	Cube(Vector, Vector, Colour);
+	Cube(Vector, float, Colour);
 	~Cube(){};
 
-	float intersect(Vector, Vector);
-	Vector normal(Vector);
+	float intersect(Vector, Vector) override;
+	Vector normal(Vector) override;
 };

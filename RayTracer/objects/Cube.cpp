@@ -1,53 +1,44 @@
 #include "Cube.h"
 
-/**
-* Cube's intersection method.  The input is a ray (pos, dir).
+/*
+Implementation based off the Ray-Box method described here:
+http://www.siggraph.org/education/materials/HyperGraph/raytrace/rtinter3.htm
 */
 float Cube::intersect(Vector pos, Vector dir)
 {
-	// todo: fixme: change this
+	auto minv = (minVector - pos) / dir;
+	auto maxv = (maxVector - pos) / dir;
 
-	float tx1, tx2, ty1, ty2, tz1, tz2, tmin, tmax;
-	tx1 = (xmin - pos.x) / dir.x;
-	tx2 = (xmax - pos.x) / dir.x;
-	ty1 = (ymin - pos.y) / dir.y;
-	ty2 = (ymax - pos.y) / dir.y;
-	tz1 = (zmin - pos.z) / dir.z;
-	tz2 = (zmax - pos.z) / dir.z;
+	if (minv.x > maxv.x) swap(minv.x, maxv.x);
+	if (minv.y > maxv.y) swap(minv.y, maxv.y);
+	if (minv.z > maxv.z) swap(minv.z, maxv.z);
 
-	tmin = std::max(std::min(tx1, tx2), std::max(std::min(ty1, ty2), std::min(tz1, tz2)));
-	tmax = std::min(std::max(tx1, tx2), std::min(std::max(ty1, ty2), std::max(tz1, tz2)));
+	auto mint = max(minv.x, max(minv.y, minv.z));
+	auto maxt = min(maxv.x, min(maxv.y, maxv.z));
 
-	if (tmin < tmax) {
-		return tmin;
-	}
-	else {
-		return -1;
-	}
+	return mint < maxt ? mint : -1;
 }
 
-/**
-* Returns the unit normal vector at a given point.
-* Assumption: The input point p lies on the cube.
-*/
-Vector Cube::normal(Vector p)
+Vector Cube::normal(Vector point)
 {
-	// todo: fixme: change this
+	const float tollerance = 0.000001;
+	auto n = point - center;
+	auto maxx = fabs(n.x);
+	auto maxy = fabs(n.y);
+	auto maxz = fabs(n.z);
 
-	Vector max(xmax, ymax, zmax);
-	Vector min(xmin, ymin, zmin);
-	Vector center = (max + min) / 2;
-	Vector n = p - center;
-	float largest = std::max(fabs(n.x), std::max(fabs(n.y), fabs(n.z)));
-	if (fabs(n.x) == largest) {
+	auto maxDir = max(maxx, maxy);
+	maxDir = max(maxDir, maxz);
+
+	if (maxx < maxDir + tollerance && maxx > maxDir - tollerance) {
 		n.y = 0.0;
 		n.z = 0.0;
 	}
-	else if (fabs(n.y) == largest) {
+	else if (maxy < maxDir + tollerance && maxy > maxDir - tollerance) {
 		n.x = 0.0;
 		n.z = 0.0;
 	}
-	else if (fabs(n.z) == largest) {
+	else {
 		n.x = 0.0;
 		n.y = 0.0;
 	}
@@ -55,13 +46,19 @@ Vector Cube::normal(Vector p)
 	return n;
 }
 
-Cube::Cube(Vector corner1, Vector corner2, Colour color)
+Cube::Cube(Vector position, float size, Colour colour)
 {
-	this->color = color;
-	xmin = std::min(corner1.x, corner2.x);
-	xmax = std::max(corner1.x, corner2.x);
-	ymin = std::min(corner1.y, corner2.y);
-	ymax = std::max(corner1.y, corner2.y);
-	zmin = std::min(corner1.z, corner2.z);
-	zmax = std::max(corner1.z, corner2.z);
+	Vector corner1(position.x + size, position.y + size, position.z + size);
+	Vector corner2(position.x - size, position.y - size, position.z - size);
+
+	auto maxX = max(corner1.x, corner2.x);
+	auto maxY = max(corner1.y, corner2.y);
+	auto maxZ = max(corner1.z, corner2.z);
+	maxVector = Vector(maxX, maxY, maxZ);
+	auto minX = min(corner1.x, corner2.x);
+	auto minY = min(corner1.y, corner2.y);
+	auto minZ = min(corner1.z, corner2.z);
+	minVector = Vector(minX, minY, minZ);
+	center = (maxVector + minVector) / 2;
+	color = colour;
 }

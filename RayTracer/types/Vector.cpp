@@ -44,6 +44,14 @@ Vector Vector::operator/(float scale) const
     return Vector(*this) *= 1.0f / scale;
 }
 
+Vector Vector::operator/(const Vector other)
+{
+	x /= other.x;
+	y /= other.y;
+	z /= other.z;
+	return *this;
+}
+
 // Add the given vector to this one.
 const Vector& Vector::operator+=(const Vector rhs) 
 {
