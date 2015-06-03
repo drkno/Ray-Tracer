@@ -39,5 +39,7 @@ public:
 	Colour phongLight(Colour ambientCol, float diffuseTerm,  float specularTerm);
 
 	Colour average(std::vector<Colour> colours);
+	const Colour& Colour::operator+=(Colour other);
+	const Colour& Colour::operator/=(int scale);
 };
 #endif

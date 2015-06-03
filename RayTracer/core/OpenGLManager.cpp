@@ -10,29 +10,18 @@ void OpenGLManager::run(int argc, char* argv[])
 	glutInitWindowPosition(WINDOW_XPOS, WINDOW_YPOS);
 	glutCreateWindow(WINDOW_TITLE);
 	windowRayTracer = new RayTracer();
-	glutDisplayFunc(windowDisplayCallback);
-	//glutTimerFunc(CALLBACK_RATE, displayRefreshCallback, 0);
 	glutReshapeFunc(windowReshapeCallback);
 	glutSpecialFunc(specialKeypressCallback);
 	glutMouseFunc(mouseClickCallback);
 	glutKeyboardFunc(keypressCallback);
+	glutDisplayFunc(windowDisplayCallback);
 	glutMainLoop();
 	windowRayTracer->~RayTracer();
 }
 
 void OpenGLManager::windowDisplayCallback()
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
 	windowRayTracer->display();
-	glutSwapBuffers();
-}
-
-void OpenGLManager::displayRefreshCallback(int value)
-{
-	glutPostRedisplay();
-	glutTimerFunc(CALLBACK_RATE, displayRefreshCallback, ++value);
 }
 
 void OpenGLManager::windowReshapeCallback(GLint newWidth, GLint newHeight)

@@ -65,7 +65,9 @@ private:
 	float pixelSize = 1.0 / PPU;
 	Vector eye = Vector(0., 0., 0.);
 	float halfPixelSize = pixelSize / 2.0;
-	float samplingLevel = 2;
+	int samplingLevel = 4;
+	int samplingSize = 16;
+	float aaPixelSize = (samplingLevel / samplingSize) * pixelSize;
 	float halfSupersamplePixelSize = (pixelSize / samplingLevel) / 2.0;
 	float edist = 40.0;
 	float fogProgression;

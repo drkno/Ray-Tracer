@@ -85,7 +85,36 @@ Colour RayTracer::trace(Vector pos, Vector dir, int step)
 	bool shouldReflect = false;
 	if (sceneObjects[q.index]->isRefractive() && step < MAX_STEPS)
 	{
-		const float airRatio = 1.0f;
+		float n1 = 1.0;
+		float n2 = sceneObjects[q.index]->getRefractiveIndex();
+
+		float nRatio = n1 / n2;
+
+		float thetat = sqrtf(1 - powf(nRatio, 2)*(1 - powf(dir.dot(n), 2)));
+		
+		Vector ns = n;
+		ns.scale(nRatio * dir.dot(n) + cos(thetat));
+		Vector dirs = dir;
+		dirs.scale(nRatio);
+
+		Vector g = dirs - ns;
+
+		auto otherSide = closestPt(q.point, g);
+
+		swap(n1, n2);
+		nRatio = n1 / n2;
+
+		thetat = sqrtf(1 - powf(nRatio, 2)*(1 - powf(dir.dot(n), 2)));
+
+		ns = sceneObjects[q.index]->normal(q.point);
+		ns.scale(-1);
+		ns.scale(nRatio * dir.dot(n) + cos(thetat));
+		dirs = g;
+		dirs.scale(nRatio);
+
+		g = dirs - ns;
+		return trace(otherSide.point, g, step + 1);
+		/*const float airRatio = 1.0f;
 
 
 		float refractionCoeff = sceneObjects[q.index]->getRefractiveIndex();
@@ -110,7 +139,7 @@ Colour RayTracer::trace(Vector pos, Vector dir, int step)
 
 		Colour refractionColour = trace(otherSide.point, dir, step + 1);
 		//refractionColour.combineColor(colorSum, 0.50);
-		colourSum = refractionColour;
+		colourSum = refractionColour;*/
 	}
 
 	// generate reflection ray
@@ -198,9 +227,13 @@ void RayTracer::displayMultithread(RayTracer *tracer, int heightInPixels, int wi
 //---------------------------------------------------------------------------------------
 void RayTracer::display()
 {
+	cout << "Starting Redraw..." << endl << "0% complete.";
 	int widthInPixels = WIDTH * PPU;
 	int heightInPixels = HEIGHT * PPU;
 	float x1, y1;
+
+	int completionPix = widthInPixels / 100;
+	int percent = 0;
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -214,10 +247,13 @@ void RayTracer::display()
 			y1 = YMIN + j * pixelSize;
 			drawPixel(x1, y1);
 		}
+		
+		if (i % completionPix == 0) cout << "\r" << percent++ << "% complete.";
 	}
 
 	glEnd();
 	glFlush();
+	cout << "\r100% complete." << endl << "Redraw Complete." << endl;
 }
 
 #endif
@@ -243,19 +279,22 @@ Colour RayTracer::getColourNone(float *x, float *y, float *halfSize)
 
 Colour RayTracer::getColourSupersample(float *x, float *y)
 {
-	vector<Colour> colours;
-	for (int i = 0; i < samplingLevel; i++)
+	Colour average(0, 0, 0);
+	float frag_x = *x, frag_y;
+	for (auto i = 0; i < samplingLevel; i++)
 	{
-		float yPos = *y + 2.0 * halfSupersamplePixelSize;
-		for (int j = 0; j < samplingLevel; j++)
+		frag_y = *y;
+		for (auto j = 0; j < samplingLevel; j++)
 		{
-			float xPos = *x + 2.0 * halfSupersamplePixelSize;
-			colours.push_back(getColourNone(&xPos, &yPos, &halfSupersamplePixelSize));
+			Vector direction(frag_x, frag_y, -edist);
+			direction.normalise();
+			average += trace(eye, direction, 1);
+			frag_y += aaPixelSize;
 		}
+		frag_x += aaPixelSize;
 	}
-	Colour col = colours[colours.size() - 1];
-	colours.pop_back();
-	return col.average(colours);
+	average /= samplingSize;
+	return average;
 }
 
 void RayTracer::drawPixel(float x, float y)
@@ -285,37 +324,37 @@ RayTracer::RayTracer()
 	glLoadIdentity();
 	glClearColor(0, 0, 0, 1);
 
-	//Sphere* sphere1 = new Sphere(Vector(0, 0, -40), 3.0, Colour::RED);
-	//sphere1->setRefractiveIndex(0.8);
+	/*Sphere* sphere1 = new Sphere(Vector(0, -5, -40), 3.0, Colour::RED);
+	sphere1->setRefractiveIndex(1.333);
 	Sphere* sphere2 = new Sphere(Vector(-10, 6, -100), 4.0, Colour::GREEN);
 	sphere2->setReflectiveness(1);
 	Sphere* sphere3 = new Sphere(Vector(5, 0, -100), 10.0, Colour::BLUE);
 	sphere3->setReflectiveness(0.65);
 
-	//sceneObjects.push_back(sphere1);
+	sceneObjects.push_back(sphere1);
 	sceneObjects.push_back(sphere2);
 	sceneObjects.push_back(sphere3);
 
 	
 
 	Cube* cube = new Cube(Vector(10, -7, -80), 2.5, Colour::GREEN);
-	sceneObjects.push_back(cube);
+	sceneObjects.push_back(cube);*/
 
 	auto plane = new ChequeredFloor(Vector(-300, -10, 300), Vector(300, -10, 300),
 	                         Vector(300, -10, -150), Vector(-300, -10, -150), Colour::WHITE, Colour::BLACK);
 	sceneObjects.push_back(plane);
 
-	ProcedualSphere *procedual = new ProcedualSphere(Vector(-10, 0, -80), 2.5);
-	sceneObjects.push_back(procedual);
+	//ProcedualSphere *procedual = new ProcedualSphere(Vector(-10, 0, -80), 2.5);
+	//sceneObjects.push_back(procedual);
 
-	ImageSphere *imageSphere = new ImageSphere(Vector(0, 15, -70), 5.0, "Moon.raw", 256, 128);
+	ImageSphere *imageSphere = new ImageSphere(Vector(0, 0, -50), 5.0, "Moon.raw", 256, 128);
 	sceneObjects.push_back(imageSphere);
 
-	Cylinder *cylinder = new Cylinder(Vector(0, -5, -50), 3, 2.5, Colour::RED);
-	sceneObjects.push_back(cylinder);
+	//Cylinder *cylinder = new Cylinder(Vector(0, -5, -50), 3, 2.5, Colour::RED);
+	//sceneObjects.push_back(cylinder);
 
-	Cone *cone = new Cone(Vector(0, 0, -30), 6, 3, Colour::GREEN);
-	sceneObjects.push_back(cone);
+	//Cone *cone = new Cone(Vector(0, 0, -30), 6, 3, Colour::GREEN);
+	//sceneObjects.push_back(cone);
 
 }
 
@@ -351,11 +390,31 @@ void RayTracer::special(int key, int, int)
 
 void RayTracer::key(unsigned char key, int, int)
 {
-	if (key == 'a')
+	switch (key)
 	{
-		int aaType = type;
-		type = static_cast<AntiAliasType>((aaType + 1) % 2);
+		case 'A':
+		case 'a':
+		{
+			int aaType = type;
+			type = static_cast<AntiAliasType>((aaType + 1) % 2);
+			cout << "Anti-Aliasing mode switched to: " << (type == 0 ? "Off" : "Supersample") << endl;
+			glutPostRedisplay();
+			break;
+		}
+#if THREADS == 1
+		case 'T':
+		case 't':
+		{
+			threads = !threads;
+			cout << "Threading mode switched to: " << (threads ? "On" : "Off") << endl;
+			break;
+		}
+#endif
+		case 'Q':
+		case 'q':
+		{
+			exit(0);
+			break;
+		}
 	}
-	std::cout << type << std::endl;
-	glutPostRedisplay();
 }
