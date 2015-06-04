@@ -68,7 +68,8 @@ Colour RayTracer::trace(Vector pos, Vector dir, int step)
 	if (s.index > -1 && s.dist < lightDist || lDotn <= 0)
 	{
 		colourSum = col.phongLight(backgroundCol, 0.0, 0.0);
-		if (!sceneObjects[q.index]->isReflective())
+		if (!sceneObjects[q.index]->isReflective() &&
+			!sceneObjects[q.index]->isRefractive())
 		{
 			return colourSum;
 		}
@@ -85,61 +86,33 @@ Colour RayTracer::trace(Vector pos, Vector dir, int step)
 	bool shouldReflect = false;
 	if (sceneObjects[q.index]->isRefractive() && step < MAX_STEPS)
 	{
-		float n1 = 1.0;
-		float n2 = sceneObjects[q.index]->getRefractiveIndex();
+		Vector d = dir, nor = n;
+		float n1 = 1.0, n2 = sceneObjects[q.index]->getRefractiveIndex();
+		float r = n1 / n2;
 
-		float nRatio = n1 / n2;
+		float e = 1 - powf(r, 2) * (1 - powf(dir.dot(n), 2));
+		float t = sqrtf(e);
 
-		float thetat = sqrtf(1 - powf(nRatio, 2)*(1 - powf(dir.dot(n), 2)));
-		
-		Vector ns = n;
-		ns.scale(nRatio * dir.dot(n) + cos(thetat));
-		Vector dirs = dir;
-		dirs.scale(nRatio);
+		Vector g = d * r - nor * (r * (dir.dot(n)) + t);
 
-		Vector g = dirs - ns;
+		PointBundle b = closestPt(q.point, g);
+		nor = sceneObjects[q.index]->normal(b.point);
+		nor *= -1;
+		r = n2 / n1;
+		e = 1 - powf(r, 2) * (1 - powf(g.dot(nor), 2));
+		t = sqrtf(e);
+		g = g * r - nor * (r * (g.dot(nor)) + t);
 
-		auto otherSide = closestPt(q.point, g);
-
-		swap(n1, n2);
-		nRatio = n1 / n2;
-
-		thetat = sqrtf(1 - powf(nRatio, 2)*(1 - powf(dir.dot(n), 2)));
-
-		ns = sceneObjects[q.index]->normal(q.point);
-		ns.scale(-1);
-		ns.scale(nRatio * dir.dot(n) + cos(thetat));
-		dirs = g;
-		dirs.scale(nRatio);
-
-		g = dirs - ns;
-		return trace(otherSide.point, g, step + 1);
-		/*const float airRatio = 1.0f;
-
-
-		float refractionCoeff = sceneObjects[q.index]->getRefractiveIndex();
-		float nDotV = n.dot(v);
-
-		float k = 1 - powf(refractionCoeff, 2) * (1 - powf(nDotV, 2));
-		Vector refractionVector;
-		if (k < 0.f)
+		Colour refractColour = trace(b.point, g, step + 1);
+		if (sceneObjects[q.index]->getReflectiveness() == 1)
 		{
-			shouldReflect = true;
-			refractionVector = Vector(0, 0, 0);
+			colourSum = refractColour.phongLight(backgroundCol, lDotn, spec);
 		}
 		else
 		{
-			Vector a = v, b = n;
-			a.scale(refractionCoeff);
-			b.scale(refractionCoeff * nDotV + sqrtf(k));
-			refractionVector = a - b;
+			colourSum.combineColor(refractColour, 1 / n2);
 		}
-
-		auto otherSide = closestPt(q.point, refractionVector);
-
-		Colour refractionColour = trace(otherSide.point, dir, step + 1);
-		//refractionColour.combineColor(colorSum, 0.50);
-		colourSum = refractionColour;*/
+		return colourSum;
 	}
 
 	// generate reflection ray
@@ -162,63 +135,6 @@ Colour RayTracer::trace(Vector pos, Vector dir, int step)
 }
 
 #if THREADS == 1
-
-void RayTracer::display()
-{
-	int widthInPixels = WIDTH * PPU;
-	int heightInPixels = HEIGHT * PPU;
-	if (pixels != NULL)
-	{
-		delete [] pixels;
-	}
-
-	thread threads[THREAD_NUM];
-
-	pixels = new Colour[widthInPixels * heightInPixels];
-
-	glClear(GL_COLOR_BUFFER_BIT);
-
-	for (int i = 0; i < THREAD_NUM; i++)
-	{
-		threads[i] = thread(displayMultithread, this, heightInPixels, widthInPixels, i, pixelSize);
-	}
-
-	// in separate loop to allow all threads to start up
-	for (int i = 0; i < THREAD_NUM; i++)
-	{
-		if (threads[i].joinable()) threads[i].join();
-	}
-
-	float x, y;
-	glBegin(GL_QUADS); //Each pixel is a quad.
-	for (int i = 0; i < widthInPixels; i++)
-	{
-		x = XMIN + i * pixelSize;
-		for (int j = 0; j < heightInPixels; j++)
-		{
-			y = YMIN + j * pixelSize;
-			outputPixel(&pixels[i * widthInPixels + j], &x, &y);
-		}
-	}
-	glEnd();
-	glFlush();
-}
-
-void RayTracer::displayMultithread(RayTracer *tracer, int heightInPixels, int widthInPixels, int xStart, int pixelSize)
-{
-	float x, y;
-	for (int i = xStart; i < widthInPixels; i+=THREAD_NUM)
-	{
-		x = tracer->XMIN + i * pixelSize;
-		for (int j = 0; j < heightInPixels; j++)
-		{
-			y = tracer->YMIN + j * pixelSize;
-			Colour colour = tracer->getColourNone(&x, &y, &tracer->halfPixelSize);
-			tracer->pixels[i * widthInPixels + j] = colour;
-		}
-	}
-}
-
 #else
 
 //---The main display module -----------------------------------------------------------
@@ -324,9 +240,11 @@ RayTracer::RayTracer()
 	glLoadIdentity();
 	glClearColor(0, 0, 0, 1);
 
-	/*Sphere* sphere1 = new Sphere(Vector(0, -5, -40), 3.0, Colour::RED);
-	sphere1->setRefractiveIndex(1.333);
-	Sphere* sphere2 = new Sphere(Vector(-10, 6, -100), 4.0, Colour::GREEN);
+	Sphere* sphere1 = new Sphere(Vector(0, 0, -40), 4.0, Colour::RED);
+	sphere1->setRefractiveIndex(1.3333);
+	//sphere1->setReflectiveness(1);
+	sceneObjects.push_back(sphere1);
+	/*Sphere* sphere2 = new Sphere(Vector(-10, 6, -100), 4.0, Colour::GREEN);
 	sphere2->setReflectiveness(1);
 	Sphere* sphere3 = new Sphere(Vector(5, 0, -100), 10.0, Colour::BLUE);
 	sphere3->setReflectiveness(0.65);
@@ -347,8 +265,8 @@ RayTracer::RayTracer()
 	//ProcedualSphere *procedual = new ProcedualSphere(Vector(-10, 0, -80), 2.5);
 	//sceneObjects.push_back(procedual);
 
-	ImageSphere *imageSphere = new ImageSphere(Vector(0, 0, -50), 5.0, "Moon.raw", 256, 128);
-	sceneObjects.push_back(imageSphere);
+	//ImageSphere *imageSphere = new ImageSphere(Vector(0, 0, -50), 5.0, "Moon.raw", 256, 128);
+	//sceneObjects.push_back(imageSphere);
 
 	//Cylinder *cylinder = new Cylinder(Vector(0, -5, -50), 3, 2.5, Colour::RED);
 	//sceneObjects.push_back(cylinder);
