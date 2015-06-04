@@ -141,7 +141,7 @@ Colour RayTracer::trace(Vector pos, Vector dir, int step)
 // In a ray tracing application, it just displays the ray traced image by drawing
 // each pixel as quads.
 //---------------------------------------------------------------------------------------
-void RayTracer::display()
+/*void RayTracer::display()
 {
 	cout << "Starting Redraw..." << endl << "0% complete.";
 	int widthInPixels = WIDTH * PPU;
@@ -170,7 +170,128 @@ void RayTracer::display()
 	glEnd();
 	glFlush();
 	cout << "\r100% complete." << endl << "Redraw Complete." << endl;
+}*/
+
+#include <thread>
+
+#define THREAD_COUNT 4
+
+void RayTracer::display()
+{
+	cout << "Redraw Initiated" << endl << "---------------------" << endl << "0% done.";
+
+	int doneCounter = 0;
+	int widthInPixels = WIDTH * PPU;
+	int heightInPixels = HEIGHT * PPU;
+
+	auto out = new vector<PixelStore>[THREAD_COUNT + 1];
+	vector<thread> threads;
+	for (auto i = 1; i <= THREAD_COUNT; i++)
+	{
+		threads.push_back(thread(&RayTracer::display_thread, this, ref(out[i]), i, widthInPixels, heightInPixels, ref(doneCounter), false));
+	}
+	display_thread(out[0], 0, widthInPixels, heightInPixels, doneCounter, true);
+
+	glClear(GL_COLOR_BUFFER_BIT);
+	glBegin(GL_QUADS);
+	for (auto i = 0; i < THREAD_COUNT + 1; i++)
+	{
+		if (i > 0 && threads[i - 1].joinable()) threads[i - 1].join();
+		for (auto j = 0; j < out[i].size(); j++)
+		{
+			auto store = &out[i][j];
+			outputPixel(&store->colour, &store->x, &store->y);
+		}
+	}
+	glEnd();
+	glFlush();
+
+	delete[]out;
+	cout << endl << "Complete." << endl << endl;
 }
+
+void RayTracer::display_thread(vector<PixelStore> &out, int threadNum, int widthInPixels, int heightInPixels, int &doneCounterRef, bool output)
+{
+	int *doneCounter = doneCounterRef;
+	auto doneCount = (widthInPixels / 100) * (THREAD_COUNT + 1) + threadNum;
+	float x1, y1;
+
+	for (int i = threadNum; i < widthInPixels; i += (THREAD_COUNT+1))
+	{
+		x1 = XMIN + i * pixelSize;
+		for (int j = 0; j < heightInPixels; j++)
+		{
+			y1 = YMIN + j * pixelSize;
+			Colour colour = getPixel(&x1, &y1);
+			PixelStore store(colour, x1, y1);
+			out.push_back(store);
+		}
+		if (i % doneCount == 0)
+		{
+			(&doneCounter) = 9;
+			if (output)
+			{
+				cout << "\r" << *doneCounter << "% done.";
+			}
+		}
+	}
+}
+
+Colour RayTracer::getPixel(float *x, float *y)
+{
+	Colour colour;
+	switch (type)
+	{
+	default:
+	case None:
+	{
+		colour = getColourNone(x, y, &halfPixelSize);
+		break;
+	}
+	case Supersample: colour = getColourSupersample(x, y); break;
+	}
+
+	return colour;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #endif
 
@@ -241,9 +362,9 @@ RayTracer::RayTracer()
 	glClearColor(0, 0, 0, 1);
 
 	Sphere* sphere1 = new Sphere(Vector(0, 0, -40), 4.0, Colour::RED);
-	sphere1->setRefractiveIndex(1.3333);
+	//sphere1->setRefractiveIndex(1.1);
 	//sphere1->setReflectiveness(1);
-	sceneObjects.push_back(sphere1);
+	//sceneObjects.push_back(sphere1);
 	/*Sphere* sphere2 = new Sphere(Vector(-10, 6, -100), 4.0, Colour::GREEN);
 	sphere2->setReflectiveness(1);
 	Sphere* sphere3 = new Sphere(Vector(5, 0, -100), 10.0, Colour::BLUE);

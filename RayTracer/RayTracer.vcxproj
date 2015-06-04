@@ -90,6 +90,7 @@
     <ClCompile Include="types\Vector.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="core\PixelStore.h" />
     <ClInclude Include="objects\Cone.h" />
     <ClInclude Include="core\AntiAliasManager.h" />
     <ClInclude Include="objects\Cylinder.h" />

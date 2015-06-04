@@ -120,5 +120,8 @@
     <ClInclude Include="objects\Cone.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="core\PixelStore.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -28,6 +28,8 @@
 #include "../types/Vector.h"
 #include "../types/PointBundle.h"
 
+#include "PixelStore.h"
+
 using namespace std;
 
 class RayTracer
@@ -79,6 +81,8 @@ private:
 	Colour getColourNone(float *x, float *y, float *halfSize);
 	void outputPixel(Colour *col, float *x, float *y);
 
+	Colour RayTracer::getPixel(float *x, float *y);
+	void display_thread(vector<PixelStore>&, int, int, int, int&, bool);
 
 #if THREADS == 1
 	Colour* pixels;
