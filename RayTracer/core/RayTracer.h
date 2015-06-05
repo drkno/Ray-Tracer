@@ -63,9 +63,9 @@ private:
 	float pixelSize = 1.0 / PPU;
 	Vector eye = Vector(0., 0., 0.);
 	float halfPixelSize = pixelSize / 2.0;
-	int samplingLevel = 4;
-	int samplingSize = 16;
-	float aaPixelSize = (samplingLevel / samplingSize) * pixelSize;
+	const int samplingLevel = 4;
+	const int samplingSize = 16;
+	const float aaPixelSize = (static_cast<float>(samplingLevel) / samplingSize) * pixelSize;
 	float edist = 40.0;
 
 	bool fogEnabled = true;
