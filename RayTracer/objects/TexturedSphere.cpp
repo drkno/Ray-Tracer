@@ -8,7 +8,7 @@ TexturedSphere::TexturedSphere(Vector c, float r, int width, int height)
 	color = Colour::WHITE;
 	this->width = width;
 	this->height = height;
-	this->texture = NULL;
+	this->texture = nullptr;
 };
 
 TexturedSphere::~TexturedSphere()

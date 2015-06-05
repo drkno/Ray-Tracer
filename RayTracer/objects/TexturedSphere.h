@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <math.h>
 #include "Sphere.h"
 
 #define PI 3.14159265358979323846

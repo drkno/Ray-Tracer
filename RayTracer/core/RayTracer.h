@@ -86,7 +86,7 @@ private:
 	Colour getColourSupersample(float *x, float *y);
 	Colour getColourNone(float *x, float *y);
 	void outputPixel(Colour *col, float *x, float *y);
-	Colour RayTracer::getPixel(float *x, float *y);
+	Colour getPixel(float *x, float *y);
 	void display_thread(vector<PixelStore>&, int, int, int);
 	void controlFogDepth(int*, int, string);
 };

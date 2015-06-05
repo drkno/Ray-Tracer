@@ -6,8 +6,7 @@
 *    and for performing operations on them.
 -------------------------------------------------------------*/
 
-#ifndef H_VECTOR
-#define H_VECTOR
+#pragma once
 
 class Vector 
 {
@@ -54,5 +53,3 @@ public:
     void normalise();
 
 };
-
-#endif //!H_VECTOR
