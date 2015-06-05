@@ -155,6 +155,23 @@ void RayTracer::key(unsigned char key, int, int)
 			exit(0);
 			break;
 		}
+		case '?':
+		case '/':
+		{
+			const string colours[] = {"White", "Blue", "Red", "Green", "Yellow", "Magenta", "Cyan" };
+			const Colour colourVals[] = { Colour::WHITE, Colour::BLUE, Colour::RED, Colour::GREEN, Colour(1, 1, 0), Colour(1, 0, 1), Colour(0, 1, 1) };
+
+			cout << "Fog" << endl
+				<< "-----------------------------------------------" << endl
+				<< "Before:\tFog Colour " << colours[fogColourPos] << endl;
+
+			fogColourPos = (fogColourPos + 1) % 7;
+			fogColour = colourVals[fogColourPos];
+
+			cout << "After:\tFog Colour " << colours[fogColourPos] << endl << endl;
+			if (fogEnabled) glutPostRedisplay();
+			break;
+		}
 	}
 }
 

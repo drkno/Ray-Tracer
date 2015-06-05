@@ -69,6 +69,7 @@ private:
 	float edist = 40.0;
 
 	bool fogEnabled = true;
+	int fogColourPos = 0;
 	Colour fogColour = Colour::WHITE;
 	int fogStart = 40;
 	int fogEnd = 120;
