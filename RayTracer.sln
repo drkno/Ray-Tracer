@@ -8,6 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8BEC5156-2A21-4250-8789-3EE3D6DAD6D9}"
 	ProjectSection(SolutionItems) = preProject
 		Makefile = Makefile
+		Readme.md = Readme.md
 	EndProjectSection
 EndProject
 Global
