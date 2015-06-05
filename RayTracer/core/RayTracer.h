@@ -68,7 +68,7 @@ private:
 	float aaPixelSize = (samplingLevel / samplingSize) * pixelSize;
 	float edist = 40.0;
 
-	bool fogEnabled = false;
+	bool fogEnabled = true;
 	Colour fogColour = Colour::WHITE;
 	int fogStart = 40;
 	int fogEnd = 120;

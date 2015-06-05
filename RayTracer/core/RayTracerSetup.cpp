@@ -26,15 +26,23 @@ RayTracer::RayTracer()
 	auto earth = new ImageSphere(Vector(-10, 0, -60), 4, "Earth.raw", 256, 128);
 	sceneObjects.push_back(earth);
 
-	//auto box = new Cube(Vector(0, -7, -50), 3, Colour::GREEN);
-	//box->setReflectiveness(0.99);
-	//sceneObjects.push_back(box);
+	auto box = new Cube(Vector(4, -8, -40), 1.5, Colour::GREEN);
+	sceneObjects.push_back(box);
 
-	auto refractiveSphere = new Sphere(Vector(0, -5, -70), 5, Colour::BLACK);
+	auto texturedSphere = new ProcedualSphere(Vector(-4, -8, -40), 2);
+	sceneObjects.push_back(texturedSphere);
+
+	auto refractiveSphere = new Sphere(Vector(0, -5, -50), 3, Colour::BLACK);
 	refractiveSphere->setRefractiveIndex(1.3333);
 	sceneObjects.push_back(refractiveSphere);
 
 	auto reflectiveSphere = new Sphere(Vector(0, 0, -90), 10, Colour::BLUE);
 	reflectiveSphere->setReflectiveness(0.6);
 	sceneObjects.push_back(reflectiveSphere);
+
+	auto boundryCube1 = new Cube(Vector(-33, 5, -80), 15, Colour(0.5, 0, 0));
+	sceneObjects.push_back(boundryCube1);
+
+	auto boundryCube2 = new Cube(Vector(33, 5, -80), 15, Colour::BLUE);
+	sceneObjects.push_back(boundryCube2);
 }
