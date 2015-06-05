@@ -59,7 +59,7 @@ private:
 	vector<Object*> sceneObjects;
 	Vector light = Vector(10.0, 40.0, -5.0);
 	Colour backgroundCol = Colour::GRAY;
-	AntiAliasType type = None;
+	AntiAliasType type = Supersample;
 	float pixelSize = 1.0 / PPU;
 	Vector eye = Vector(0., 0., 0.);
 	float halfPixelSize = pixelSize / 2.0;
