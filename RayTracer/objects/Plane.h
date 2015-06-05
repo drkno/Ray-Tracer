@@ -6,8 +6,7 @@
 *  methods intersect() and normal().
 -------------------------------------------------------------*/
 
-#ifndef H_PLANE
-#define H_PLANE
+#pragma once
 
 #include "../types/Vector.h"
 #include "Object.h"
@@ -19,14 +18,8 @@ protected:
 
 public:	
 	Plane(void);
-    Plane(Vector pa, Vector pb, Vector pc, Vector pd, Colour col)
-		: a(pa), b(pb), c(pc), d(pd)
-	{
-		color = col;
-	};
+	Plane(Vector, Vector, Vector, Vector, Colour);
 	bool isInside(Vector);
 	float intersect(Vector, Vector);
 	Vector normal(Vector);
 };
-
-#endif //!H_PLANE

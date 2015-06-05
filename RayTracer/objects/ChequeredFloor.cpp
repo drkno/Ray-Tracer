@@ -1,5 +1,11 @@
 #include "ChequeredFloor.h"
 
+ChequeredFloor::ChequeredFloor(Vector pa, Vector pb, Vector pc, Vector pd, Colour colA, Colour colB)
+	: Plane(pa, pb, pc, pd, colA)
+{
+	colorB = colB;
+};
+
 Colour ChequeredFloor::getColour(Vector pos)
 {
 	float x = (a - b).x / GRIDX;

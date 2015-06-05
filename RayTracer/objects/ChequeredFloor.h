@@ -13,10 +13,6 @@ private:
 public:
 	Colour getColour(Vector);
 	ChequeredFloor(void);
-	ChequeredFloor(Vector pa, Vector pb, Vector pc, Vector pd, Colour colA, Colour colB)
-		: Plane(pa,pb,pc,pd,colA)
-	{
-		colorB = colB;
-	};
+	ChequeredFloor(Vector, Vector, Vector, Vector, Colour, Colour);
 };
 
