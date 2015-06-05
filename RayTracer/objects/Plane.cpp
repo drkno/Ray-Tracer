@@ -7,8 +7,6 @@
 -------------------------------------------------------------*/
 
 #include "Plane.h"
-#include "../types/Vector.h"
-#include <math.h>
 
 Plane::Plane(Vector pa, Vector pb, Vector pc, Vector pd, Colour col)
 {

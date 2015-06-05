@@ -10,6 +10,7 @@
 
 #include "../types/Vector.h"
 #include "Object.h"
+#include <math.h>
 
 class Plane : public Object
 {

@@ -30,5 +30,5 @@ protected:
 public:	
 	TexturedSphere(Vector, float, int, int);
 	~TexturedSphere();
-	Colour getColour(Vector);
+	Colour getColour(Vector) override;
 };
