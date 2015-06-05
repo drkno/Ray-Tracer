@@ -72,6 +72,7 @@
     <None Include="textures\Moon.raw" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="core\RayTracerControls.cpp" />
     <ClCompile Include="objects\Cone.cpp" />
     <ClCompile Include="objects\Cylinder.cpp" />
     <ClCompile Include="objects\ImageSphere.cpp" />

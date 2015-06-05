@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <string>
 #include <cmath>
 #include <vector>
 #include <GL/glut.h>
@@ -58,19 +59,22 @@ private:
 	vector<Object*> sceneObjects;
 	Vector light = Vector(10.0, 40.0, -5.0);
 	Colour backgroundCol = Colour::GRAY;
-	Colour fogColour = Colour::WHITE;
-	int fogStart = 80;
-	int fogEnd = 120;
-	AntiAliasType type = AntiAliasType::None;
+	AntiAliasType type = None;
 	float pixelSize = 1.0 / PPU;
 	Vector eye = Vector(0., 0., 0.);
 	float halfPixelSize = pixelSize / 2.0;
 	int samplingLevel = 4;
 	int samplingSize = 16;
 	float aaPixelSize = (samplingLevel / samplingSize) * pixelSize;
-	float halfSupersamplePixelSize = (pixelSize / samplingLevel) / 2.0;
 	float edist = 40.0;
-	float fogProgression;
+
+	bool fogEnabled = false;
+	Colour fogColour = Colour::WHITE;
+	int fogStart = 40;
+	int fogEnd = 120;
+	float fogMax = 0.5;
+	int fogRange;
+
 #ifdef CPP11
 	unsigned int numberOfThreads = 4;
 #else
@@ -80,10 +84,10 @@ private:
 	// Private Methods
 	PointBundle closestPt(Vector pos, Vector dir);
 	Colour getColourSupersample(float *x, float *y);
-	Colour getColourNone(float *x, float *y, float *halfSize);
+	Colour getColourNone(float *x, float *y);
 	void outputPixel(Colour *col, float *x, float *y);
-
 	Colour RayTracer::getPixel(float *x, float *y);
 	void display_thread(vector<PixelStore>&, int, int, int);
+	void controlFogDepth(int*, int, string);
 };
 

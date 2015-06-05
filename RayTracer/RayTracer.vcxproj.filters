@@ -67,6 +67,9 @@
     <ClCompile Include="objects\Cone.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="core\RayTracerControls.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core\OpenGLManager.h">

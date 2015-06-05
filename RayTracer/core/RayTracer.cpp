@@ -40,28 +40,38 @@ Colour RayTracer::trace(Vector pos, Vector dir, int step)
 {
 	auto q = closestPt(pos, dir);
 
-	/*float fogAmount = fogProgression * (q.dist - fogStart);
-	Colour background = backgroundCol;
-	backgroundCol.combineColor(fogColourfogProgression);*/
+	float fog = 0;
+	if (fogEnabled)
+	{
+		auto fogPos = -q.point.z - fogStart;
+		if (fogPos > fogRange || q.index == -1) fogPos = fogRange;
+		else if (fogPos < 0) fogPos = 0;
+		fog = fogPos / fogRange * fogMax;
+	}
 
-	if (q.index == -1) return backgroundCol; //no intersection
+	if (q.index == -1)
+	{
+		auto b = backgroundCol;
+		if (fogEnabled) b.combineColor(fogColour, fog);
+		return b; //no intersection
+	}
 
 	auto n = sceneObjects[q.index]->normal(q.point);
 	auto l = light - q.point;
 	l.normalise();
-	float lDotn = l.dot(n); //Note ‘l’ is the letter el, not the number 1.
+	auto lDotn = l.dot(n); //Note ‘l’ is the letter el, not the number 1.
 
-	Colour col = sceneObjects[q.index]->getColour(q.point); //Object's colour
+	auto col = sceneObjects[q.index]->getColour(q.point); //Object's colour
 
-	Vector lightVector = light - q.point;
-	float lightDist = lightVector.length(); //Distance to light
+	auto lightVector = light - q.point;
+	auto lightDist = lightVector.length(); //Distance to light
 	lightVector.normalise();
-	PointBundle s = closestPt(q.point, lightVector);
+	auto s = closestPt(q.point, lightVector);
 
 	Vector v(-dir.x, -dir.y, -dir.z); //View vector;
 
 	Colour colourSum;
-	float spec = 0.0f;
+	auto spec = 0.0f;
 
 	if (s.index > -1 && s.dist < lightDist || lDotn <= 0)
 	{
@@ -69,31 +79,31 @@ Colour RayTracer::trace(Vector pos, Vector dir, int step)
 		if (!sceneObjects[q.index]->isReflective() &&
 			!sceneObjects[q.index]->isRefractive())
 		{
+			if (fogEnabled) colourSum.combineColor(fogColour, fog);
 			return colourSum;
 		}
 	}
 	else
 	{
-		Vector r = ((n * 2) * lDotn) - l; // r = 2(L.n)n – L. ‘l’ = el
+		auto r = ((n * 2) * lDotn) - l; // r = 2(L.n)n – L. ‘l’ = el
 		r.normalise();
-		float rDotv = r.dot(v);
+		auto rDotv = r.dot(v);
 		spec = rDotv < 0 ? 0.0 : pow(rDotv, 10); //Phong exponent = 10
 		colourSum = col.phongLight(backgroundCol, lDotn, spec);
 	}
 
-	bool shouldReflect = false;
 	if (sceneObjects[q.index]->isRefractive() && step < MAX_STEPS)
 	{
-		Vector d = dir, nor = n;
+		auto d = dir, nor = n;
 		float n1 = 1.0, n2 = sceneObjects[q.index]->getRefractiveIndex();
-		float r = n1 / n2;
+		auto r = n1 / n2;
 
-		float e = 1 - powf(r, 2) * (1 - powf(dir.dot(n), 2));
-		float t = sqrtf(e);
+		auto e = 1 - powf(r, 2) * (1 - powf(dir.dot(n), 2));
+		auto t = sqrtf(e);
 
-		Vector g = d * r - nor * (r * (dir.dot(n)) + t);
+		auto g = d * r - nor * (r * (dir.dot(n)) + t);
 
-		PointBundle b = closestPt(q.point, g);
+		auto b = closestPt(q.point, g);
 		nor = sceneObjects[q.index]->normal(b.point);
 		nor *= -1;
 		r = n2 / n1;
@@ -101,7 +111,7 @@ Colour RayTracer::trace(Vector pos, Vector dir, int step)
 		t = sqrtf(e);
 		g = g * r - nor * (r * (g.dot(nor)) + t);
 
-		Colour refractColour = trace(b.point, g, step + 1);
+		auto refractColour = trace(b.point, g, step + 1);
 		if (sceneObjects[q.index]->getReflectiveness() == 1)
 		{
 			colourSum = refractColour.phongLight(backgroundCol, lDotn, spec);
@@ -110,15 +120,17 @@ Colour RayTracer::trace(Vector pos, Vector dir, int step)
 		{
 			colourSum.combineColor(refractColour, 1 / n2);
 		}
+
+		if (fogEnabled) colourSum.combineColor(fogColour, fog);
 		return colourSum;
 	}
 
 	// generate reflection ray
-	if (shouldReflect || sceneObjects[q.index]->isReflective() && step < MAX_STEPS)
+	if (sceneObjects[q.index]->isReflective() && step < MAX_STEPS)
 	{
-		float reflCoeff = shouldReflect ? 1 : sceneObjects[q.index]->getReflectiveness();
-		Vector reflectionVector = ((n * 2) * (n.dot(v))) - v;
-		Colour reflectionColor = trace(q.point, reflectionVector, step + 1);
+		auto reflCoeff = sceneObjects[q.index]->getReflectiveness();
+		auto reflectionVector = ((n * 2) * (n.dot(v))) - v;
+		auto reflectionColor = trace(q.point, reflectionVector, step + 1);
 		if (reflCoeff == 1)
 		{
 			colourSum = reflectionColor.phongLight(backgroundCol, lDotn, spec);
@@ -129,6 +141,7 @@ Colour RayTracer::trace(Vector pos, Vector dir, int step)
 		}
 	}
 
+	if (fogEnabled) colourSum.combineColor(fogColour, fog);
 	return colourSum;
 }
 
@@ -208,7 +221,7 @@ Colour RayTracer::getPixel(float *x, float *y)
 	default:
 	case None:
 	{
-		colour = getColourNone(x, y, &halfPixelSize);
+		colour = getColourNone(x, y);
 		break;
 	}
 	case Supersample: colour = getColourSupersample(x, y); break;
@@ -226,10 +239,10 @@ void RayTracer::outputPixel(Colour *col, float *x, float *y)
 	glVertex2f(*x, *y + pixelSize);
 }
 
-Colour RayTracer::getColourNone(float *x, float *y, float *halfSize)
+Colour RayTracer::getColourNone(float *x, float *y)
 {
-	float xc = *x + *halfSize;
-	float yc = *y + *halfSize;
+	float xc = *x + halfPixelSize;
+	float yc = *y + halfPixelSize;
 	Vector dir(xc, yc, -edist); //direction of the primary ray
 	dir.normalise(); //Normalise this direction
 	return trace(eye, dir, 1); //Trace the primary ray and get the colour value
@@ -257,7 +270,7 @@ Colour RayTracer::getColourSupersample(float *x, float *y)
 
 RayTracer::RayTracer()
 {
-	fogProgression = 0.5 / (fogEnd - fogStart);
+	fogRange = fogEnd - fogStart;
 
 	glMatrixMode(GL_PROJECTION);
 	gluOrtho2D(XMIN, XMAX, YMIN, YMAX);
@@ -287,8 +300,8 @@ RayTracer::RayTracer()
 	                         Vector(300, -10, -150), Vector(-300, -10, -150), Colour::WHITE, Colour::BLACK);
 	sceneObjects.push_back(plane);
 
-	//ProcedualSphere *procedual = new ProcedualSphere(Vector(-10, 0, -80), 2.5);
-	//sceneObjects.push_back(procedual);
+	ProcedualSphere *procedual = new ProcedualSphere(Vector(-10, 0, -80), 2.5);
+	sceneObjects.push_back(procedual);
 
 	//ImageSphere *imageSphere = new ImageSphere(Vector(0, 0, -50), 5.0, "Moon.raw", 256, 128);
 	//sceneObjects.push_back(imageSphere);
@@ -308,100 +321,5 @@ RayTracer::~RayTracer()
 		auto object = sceneObjects.back();
 		sceneObjects.pop_back();
 		delete object;
-	}
-}
-
-void RayTracer::special(int key, int, int)
-{
-	switch (key)
-	{
-	case GLUT_KEY_UP:
-	{
-		cout << "Eye Distance" << endl
-			<< "-----------------------------------------------" << endl
-			<< "Before:\t" << edist << endl;
-
-		if (edist == 100) break;
-		edist += 2;
-		
-		cout << "After:\t" << edist << endl << endl;
-		glutPostRedisplay();
-		break;
-	}
-	case GLUT_KEY_DOWN:
-	{
-		cout << "Eye Distance" << endl
-			<< "-----------------------------------------------" << endl
-			<< "Before:\t" << edist << endl;
-
-		if (edist == 0) break;
-		edist -= 2;
-		
-		cout << "After:\t" << edist << endl << endl;
-		glutPostRedisplay();
-		break;
-	}
-	}
-}
-
-void RayTracer::key(unsigned char key, int, int)
-{
-	switch (key)
-	{
-		case 'A':
-		case 'a':
-		{
-			string aa[] = {"None", "Supersample"};
-			cout << "Anti-Aliasing" << endl
-			<< "-----------------------------------------------" << endl
-			<< "Before:\t" << aa[type].c_str() << endl;
-
-			type = static_cast<AntiAliasType>((type + 1) % 2);
-
-			cout << "After:\t" << aa[type].c_str() << endl << endl;
-
-			glutPostRedisplay();
-			break;
-		}
-#ifdef CPP11
-		case '=':
-		case '+':
-		{
-			cout << "Threads" << endl
-				<< "-----------------------------------------------" << endl
-				<< "Before:\t" << numberOfThreads << endl;
-
-			if (numberOfThreads < 20) numberOfThreads++;
-
-			cout << "After:\t" << numberOfThreads << endl << endl;
-			break;
-		}
-		case '-':
-		case '_':
-		{
-			cout << "Threads" << endl
-				<< "-----------------------------------------------" << endl
-				<< "Before:\t" << numberOfThreads << endl;
-
-			if (numberOfThreads > 0) numberOfThreads--;
-
-			cout << "After:\t" << numberOfThreads << endl << endl;
-			break;
-		}
-#endif
-		case 'R':
-		case 'r':
-		{
-			cout << "Forcing Redraw..." << endl;
-			glutPostRedisplay();
-			break;
-		}
-		case 'Q':
-		case 'q':
-		{
-			cout << "Quitting..." << endl;
-			exit(0);
-			break;
-		}
 	}
 }
