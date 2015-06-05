@@ -73,6 +73,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="core\RayTracerControls.cpp" />
+    <ClCompile Include="core\RayTracerSetup.cpp" />
     <ClCompile Include="objects\Cone.cpp" />
     <ClCompile Include="objects\Cylinder.cpp" />
     <ClCompile Include="objects\ImageSphere.cpp" />

@@ -43,8 +43,13 @@ float Cylinder::intersect(Vector pos, Vector dir)
 	{
 		return t[0];
 	}
+	yVal = dir.y * t[1] + pos.y;
+	/*if (yVal < heightMax && yVal > heightMin)
+	{
+		return t[1];
+	}
 
-	// caps
+	/ * / caps
 	yVal = dir.y * t[1] + pos.y;
 	if (yVal < heightMax && yVal > heightMin)
 	{
@@ -54,7 +59,7 @@ float Cylinder::intersect(Vector pos, Vector dir)
 		Vector planeCenter = center;
 		planeCenter.y = heightMax;
 		return (planeCenter - pos).dot(normal) / nDotd;
-	}
+	}*/
 
 	return -1;
 }
@@ -63,14 +68,7 @@ Vector Cylinder::normal(Vector pos)
 {
 	Vector n;
 	float rad = sqrtf(powf(pos.x - center.x, 2) + powf(pos.z - center.z, 2));
-	if (rad < radius && (pos.y == heightMax || pos.y == heightMin))
-	{
-		n = Vector(0, pos.y - center.y, 0);
-	}
-	else
-	{
-		n = Vector(pos.x - center.x, 0, pos.z - center.z);
-	}
+	n = Vector(pos.x - center.x, 0, pos.z - center.z);
 	n.normalise();
 	return n;
 }

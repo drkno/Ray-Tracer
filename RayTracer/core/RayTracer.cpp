@@ -268,52 +268,6 @@ Colour RayTracer::getColourSupersample(float *x, float *y)
 	return average;
 }
 
-RayTracer::RayTracer()
-{
-	fogRange = fogEnd - fogStart;
-
-	glMatrixMode(GL_PROJECTION);
-	gluOrtho2D(XMIN, XMAX, YMIN, YMAX);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glClearColor(0, 0, 0, 1);
-
-	//Sphere* sphere1 = new Sphere(Vector(0, 0, -40), 4.0, Colour::RED);
-	//sphere1->setRefractiveIndex(1.1);
-	//sphere1->setReflectiveness(1);
-	//sceneObjects.push_back(sphere1);
-	/*Sphere* sphere2 = new Sphere(Vector(-10, 6, -100), 4.0, Colour::GREEN);
-	sphere2->setReflectiveness(1);
-	Sphere* sphere3 = new Sphere(Vector(5, 0, -100), 10.0, Colour::BLUE);
-	sphere3->setReflectiveness(0.65);
-
-	sceneObjects.push_back(sphere1);
-	sceneObjects.push_back(sphere2);
-	sceneObjects.push_back(sphere3);
-
-	
-
-	Cube* cube = new Cube(Vector(10, -7, -80), 2.5, Colour::GREEN);
-	sceneObjects.push_back(cube);*/
-
-	auto plane = new ChequeredFloor(Vector(-300, -10, 300), Vector(300, -10, 300),
-	                         Vector(300, -10, -150), Vector(-300, -10, -150), Colour::WHITE, Colour::BLACK);
-	sceneObjects.push_back(plane);
-
-	ProcedualSphere *procedual = new ProcedualSphere(Vector(-10, 0, -80), 2.5);
-	sceneObjects.push_back(procedual);
-
-	//ImageSphere *imageSphere = new ImageSphere(Vector(0, 0, -50), 5.0, "Moon.raw", 256, 128);
-	//sceneObjects.push_back(imageSphere);
-
-	//Cylinder *cylinder = new Cylinder(Vector(0, -5, -50), 3, 2.5, Colour::RED);
-	//sceneObjects.push_back(cylinder);
-
-	//Cone *cone = new Cone(Vector(0, 0, -30), 6, 3, Colour::GREEN);
-	//sceneObjects.push_back(cone);
-
-}
-
 RayTracer::~RayTracer()
 {
 	while (!sceneObjects.empty())

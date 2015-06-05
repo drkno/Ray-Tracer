@@ -14,10 +14,10 @@ private:
 	Colour colorB;
 
 public:
-	Colour getColour(Vector);
+	Colour getColour(Vector) override;
 	ChequeredFloor(Vector, Vector, Vector, Vector, Colour, Colour);
 	bool isInside(Vector);
-	float intersect(Vector, Vector);
-	Vector normal(Vector);
+	float intersect(Vector, Vector) override;
+	Vector normal(Vector) override;
 };
 
