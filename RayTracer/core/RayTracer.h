@@ -5,16 +5,14 @@
 #include <vector>
 #include <GL/glut.h>
 #include <GL/freeglut.h>
-
 #if defined(_MSC_VER) && _MSC_VER >= 1700 || defined(__cplusplus) && __cplusplus > 199711L
-#define THREADS 0
-#else
+#define CPP11 1
 #include <thread>
-#define THREADS 1
-#define THREAD_NUM 4
+#include <chrono>
 #endif
 
 #include "AntiAliasManager.h"
+#include "PixelStore.h"
 
 #include "../objects/Object.h"
 #include "../objects/Sphere.h"
@@ -23,12 +21,12 @@
 #include "../objects/ChequeredFloor.h"
 #include "../objects/ProcedualSphere.h"
 #include "../objects/ImageSphere.h"
+#include "../objects/Cylinder.h"
+#include "../objects/Cone.h"
 
 #include "../types/Colour.h"
 #include "../types/Vector.h"
 #include "../types/PointBundle.h"
-
-#include "PixelStore.h"
 
 using namespace std;
 
@@ -73,20 +71,19 @@ private:
 	float halfSupersamplePixelSize = (pixelSize / samplingLevel) / 2.0;
 	float edist = 40.0;
 	float fogProgression;
+#ifdef CPP11
+	unsigned int numberOfThreads = 4;
+#else
+	const unsigned int numberOfThreads = 0;
+#endif
 
 	// Private Methods
 	PointBundle closestPt(Vector pos, Vector dir);
-	void drawPixel(float x, float y);
 	Colour getColourSupersample(float *x, float *y);
 	Colour getColourNone(float *x, float *y, float *halfSize);
 	void outputPixel(Colour *col, float *x, float *y);
 
 	Colour RayTracer::getPixel(float *x, float *y);
-	void display_thread(vector<PixelStore>&, int, int, int, int&, bool);
-
-#if THREADS == 1
-	Colour* pixels;
-	static void displayMultithread(RayTracer *tracer, int heightInPixels, int widthInPixels, int xStart, int pixelSize);
-#endif
+	void display_thread(vector<PixelStore>&, int, int, int);
 };
 

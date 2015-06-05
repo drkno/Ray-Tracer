@@ -1,6 +1,4 @@
 #include "RayTracer.h"
-#include "../objects/Cylinder.h"
-#include "../objects/Cone.h"
 
 /*
 * This function compares the given ray with all objects in the scene
@@ -134,69 +132,35 @@ Colour RayTracer::trace(Vector pos, Vector dir, int step)
 	return colourSum;
 }
 
-#if THREADS == 1
-#else
-
-//---The main display module -----------------------------------------------------------
-// In a ray tracing application, it just displays the ray traced image by drawing
-// each pixel as quads.
-//---------------------------------------------------------------------------------------
-/*void RayTracer::display()
-{
-	cout << "Starting Redraw..." << endl << "0% complete.";
-	int widthInPixels = WIDTH * PPU;
-	int heightInPixels = HEIGHT * PPU;
-	float x1, y1;
-
-	int completionPix = widthInPixels / 100;
-	int percent = 0;
-
-	glClear(GL_COLOR_BUFFER_BIT);
-
-	glBegin(GL_QUADS); //Each pixel is a quad.
-
-	for (int i = 0; i < widthInPixels; i++) //Scan every "pixel"
-	{
-		x1 = XMIN + i * pixelSize;
-		for (int j = 0; j < heightInPixels; j++)
-		{
-			y1 = YMIN + j * pixelSize;
-			drawPixel(x1, y1);
-		}
-		
-		if (i % completionPix == 0) cout << "\r" << percent++ << "% complete.";
-	}
-
-	glEnd();
-	glFlush();
-	cout << "\r100% complete." << endl << "Redraw Complete." << endl;
-}*/
-
-#include <thread>
-
-#define THREAD_COUNT 4
-
 void RayTracer::display()
 {
-	cout << "Redraw Initiated" << endl << "---------------------" << endl << "0% done.";
+	cout << "Redraw Initiated" << endl << "-----------------------------------------------" << endl << "Ray-tracing...";
+#ifdef CPP11
+	auto before = chrono::high_resolution_clock::now();
+#endif
 
-	int doneCounter = 0;
 	int widthInPixels = WIDTH * PPU;
 	int heightInPixels = HEIGHT * PPU;
 
-	auto out = new vector<PixelStore>[THREAD_COUNT + 1];
+	auto out = new vector<PixelStore>[numberOfThreads + 1];
+#ifdef CPP11
 	vector<thread> threads;
-	for (auto i = 1; i <= THREAD_COUNT; i++)
+	for (auto i = 1; i <= numberOfThreads; i++)
 	{
-		threads.push_back(thread(&RayTracer::display_thread, this, ref(out[i]), i, widthInPixels, heightInPixels, ref(doneCounter), false));
+		threads.push_back(thread(&RayTracer::display_thread, this, ref(out[i]), i, widthInPixels, heightInPixels));
 	}
-	display_thread(out[0], 0, widthInPixels, heightInPixels, doneCounter, true);
+#endif
+	display_thread(out[0], 0, widthInPixels, heightInPixels);
+
+	cout << "\t\tComplete." << endl << "Drawing pixels...";
 
 	glClear(GL_COLOR_BUFFER_BIT);
 	glBegin(GL_QUADS);
-	for (auto i = 0; i < THREAD_COUNT + 1; i++)
+	for (auto i = 0; i < numberOfThreads + 1; i++)
 	{
+#ifdef CPP11
 		if (i > 0 && threads[i - 1].joinable()) threads[i - 1].join();
+#endif
 		for (auto j = 0; j < out[i].size(); j++)
 		{
 			auto store = &out[i][j];
@@ -207,32 +171,31 @@ void RayTracer::display()
 	glFlush();
 
 	delete[]out;
-	cout << endl << "Complete." << endl << endl;
+
+	cout << "\tComplete." << endl;
+#ifdef CPP11
+	auto after = chrono::high_resolution_clock::now();
+	auto duration = chrono::duration_cast<chrono::milliseconds>(after - before).count();
+	cout << "Completed in " << duration << "ms." << endl << endl;
+#else
+	cout << "Complete." << endl << endl;
+#endif
 }
 
-void RayTracer::display_thread(vector<PixelStore> &out, int threadNum, int widthInPixels, int heightInPixels, int &doneCounterRef, bool output)
+void RayTracer::display_thread(vector<PixelStore> &out, int threadNum, int widthInPixels, int heightInPixels)
 {
-	int *doneCounter = doneCounterRef;
-	auto doneCount = (widthInPixels / 100) * (THREAD_COUNT + 1) + threadNum;
+	auto doneCount = (widthInPixels / 100) * (threadNum + 1) + threadNum;
 	float x1, y1;
 
-	for (int i = threadNum; i < widthInPixels; i += (THREAD_COUNT+1))
+	for (auto i = threadNum; i < widthInPixels; i += (numberOfThreads + 1))
 	{
 		x1 = XMIN + i * pixelSize;
-		for (int j = 0; j < heightInPixels; j++)
+		for (auto j = 0; j < heightInPixels; j++)
 		{
 			y1 = YMIN + j * pixelSize;
-			Colour colour = getPixel(&x1, &y1);
+			auto colour = getPixel(&x1, &y1);
 			PixelStore store(colour, x1, y1);
 			out.push_back(store);
-		}
-		if (i % doneCount == 0)
-		{
-			(&doneCounter) = 9;
-			if (output)
-			{
-				cout << "\r" << *doneCounter << "% done.";
-			}
 		}
 	}
 }
@@ -253,48 +216,6 @@ Colour RayTracer::getPixel(float *x, float *y)
 
 	return colour;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#endif
-
 
 void RayTracer::outputPixel(Colour *col, float *x, float *y)
 {
@@ -332,23 +253,6 @@ Colour RayTracer::getColourSupersample(float *x, float *y)
 	}
 	average /= samplingSize;
 	return average;
-}
-
-void RayTracer::drawPixel(float x, float y)
-{
-	Colour colour;
-	switch (type)
-	{
-	default:
-	case None:
-	{
-		colour = getColourNone(&x, &y, &halfPixelSize);
-		break;
-	}
-	case Supersample: colour = getColourSupersample(&x, &y); break;
-	}
-
-	outputPixel(&colour, &x, &y);
 }
 
 RayTracer::RayTracer()
@@ -413,18 +317,31 @@ void RayTracer::special(int key, int, int)
 	{
 	case GLUT_KEY_UP:
 	{
+		cout << "Eye Distance" << endl
+			<< "-----------------------------------------------" << endl
+			<< "Before:\t" << edist << endl;
+
 		if (edist == 100) break;
-		edist += 1;
+		edist += 2;
+		
+		cout << "After:\t" << edist << endl << endl;
+		glutPostRedisplay();
 		break;
 	}
 	case GLUT_KEY_DOWN:
 	{
+		cout << "Eye Distance" << endl
+			<< "-----------------------------------------------" << endl
+			<< "Before:\t" << edist << endl;
+
 		if (edist == 0) break;
-		edist -= 1;
+		edist -= 2;
+		
+		cout << "After:\t" << edist << endl << endl;
+		glutPostRedisplay();
 		break;
 	}
 	}
-	glutPostRedisplay();
 }
 
 void RayTracer::key(unsigned char key, int, int)
@@ -434,24 +351,55 @@ void RayTracer::key(unsigned char key, int, int)
 		case 'A':
 		case 'a':
 		{
-			int aaType = type;
-			type = static_cast<AntiAliasType>((aaType + 1) % 2);
-			cout << "Anti-Aliasing mode switched to: " << (type == 0 ? "Off" : "Supersample") << endl;
+			string aa[] = {"None", "Supersample"};
+			cout << "Anti-Aliasing" << endl
+			<< "-----------------------------------------------" << endl
+			<< "Before:\t" << aa[type].c_str() << endl;
+
+			type = static_cast<AntiAliasType>((type + 1) % 2);
+
+			cout << "After:\t" << aa[type].c_str() << endl << endl;
+
 			glutPostRedisplay();
 			break;
 		}
-#if THREADS == 1
-		case 'T':
-		case 't':
+#ifdef CPP11
+		case '=':
+		case '+':
 		{
-			threads = !threads;
-			cout << "Threading mode switched to: " << (threads ? "On" : "Off") << endl;
+			cout << "Threads" << endl
+				<< "-----------------------------------------------" << endl
+				<< "Before:\t" << numberOfThreads << endl;
+
+			if (numberOfThreads < 20) numberOfThreads++;
+
+			cout << "After:\t" << numberOfThreads << endl << endl;
+			break;
+		}
+		case '-':
+		case '_':
+		{
+			cout << "Threads" << endl
+				<< "-----------------------------------------------" << endl
+				<< "Before:\t" << numberOfThreads << endl;
+
+			if (numberOfThreads > 0) numberOfThreads--;
+
+			cout << "After:\t" << numberOfThreads << endl << endl;
 			break;
 		}
 #endif
+		case 'R':
+		case 'r':
+		{
+			cout << "Forcing Redraw..." << endl;
+			glutPostRedisplay();
+			break;
+		}
 		case 'Q':
 		case 'q':
 		{
+			cout << "Quitting..." << endl;
 			exit(0);
 			break;
 		}
