@@ -17,5 +17,24 @@ Open the Visual Studio 2013 solution file and press build.
 Ensure both Earth.raw and Moon.raw are in the same folder as the compiled executable. Run the executable, no extra
 CLI arguments are required.
 
+## Controls
+| Key    	| Action                              	|
+|--------	|-------------------------------------	|
+| Up     	| Move eye forward                    	|
+| Down   	| Move eye back                       	|
+| a      	| Toggle Anti-aliasing                	|
+| +/=    	| Increase number of threads          	|
+| -/_    	| Decrease number of threads          	|
+| r      	| Force redraw                        	|
+| f      	| Toggle fog                          	|
+| [/{    	| Move beginning of fog closer to eye 	|
+| ]/}    	| Move beginning of fog away from eye 	|
+| ;/:    	| Move end of fog closer to eye       	|
+| ‘/”    	| Move end of fog away from eye       	|
+| ,/&lt; 	| Increase fog strength               	|
+| ./&gt; 	| Decrease fog strength               	|
+| ?      	| Cycle fog colour                    	|
+| q      	| Quit                                	|
+
 ## License
 All code that was not externally sourced is licensed under the MIT license.
