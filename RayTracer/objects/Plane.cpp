@@ -11,8 +11,11 @@
 #include <math.h>
 
 Plane::Plane(Vector pa, Vector pb, Vector pc, Vector pd, Colour col)
-	: a(pa), b(pb), c(pc), d(pd)
 {
+	a = pa;
+	b = pb;
+	c = pc;
+	d = pd;
 	color = col;
 }
 

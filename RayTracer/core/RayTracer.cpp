@@ -278,7 +278,7 @@ RayTracer::RayTracer()
 	glLoadIdentity();
 	glClearColor(0, 0, 0, 1);
 
-	Sphere* sphere1 = new Sphere(Vector(0, 0, -40), 4.0, Colour::RED);
+	//Sphere* sphere1 = new Sphere(Vector(0, 0, -40), 4.0, Colour::RED);
 	//sphere1->setRefractiveIndex(1.1);
 	//sphere1->setReflectiveness(1);
 	//sceneObjects.push_back(sphere1);
