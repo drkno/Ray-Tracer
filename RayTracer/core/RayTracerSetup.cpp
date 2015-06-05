@@ -36,6 +36,13 @@ RayTracer::RayTracer()
 	refractiveSphere->setRefractiveIndex(1.3333);
 	sceneObjects.push_back(refractiveSphere);
 
+	auto transparentSphere = new Sphere(Vector(-10, -7.5, -80), 2.5, Colour::WHITE);
+	transparentSphere->setRefractiveIndex(1);
+	sceneObjects.push_back(transparentSphere);
+
+	auto sphere = new Sphere(Vector(10, -7.5, -80), 2.5, Colour::BLACK);
+	sceneObjects.push_back(sphere);
+
 	auto reflectiveSphere = new Sphere(Vector(0, 0, -90), 10, Colour::BLUE);
 	reflectiveSphere->setReflectiveness(0.6);
 	sceneObjects.push_back(reflectiveSphere);
