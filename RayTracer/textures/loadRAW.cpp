@@ -14,7 +14,7 @@ float* loadRAW(std::string filename, int width, int height)
 	auto colourData = new float[size];
 	for (auto i = 0; i < size; i++)
 	{
-		colourData[i] = (imageData[i] & 0xFF) / 255.0;
+		colourData[i] = static_cast<unsigned char>(imageData[i]) / 255.0;
 	}
 	delete imageData;
 	return colourData;

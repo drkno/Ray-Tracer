@@ -1,4 +1,5 @@
 #include "RayTracer.h"
+#include "OpenGLManager.h"
 
 void RayTracer::special(int key, int, int)
 {
@@ -14,7 +15,7 @@ void RayTracer::special(int key, int, int)
 			edist += 2;
 
 			cout << "After:\t" << edist << endl << endl;
-			glutPostRedisplay();
+			OpenGLManager::retraceRequired();
 			break;
 		}
 		case GLUT_KEY_DOWN:
@@ -27,7 +28,7 @@ void RayTracer::special(int key, int, int)
 			edist -= 2;
 
 			cout << "After:\t" << edist << endl << endl;
-			glutPostRedisplay();
+			OpenGLManager::retraceRequired();
 			break;
 		}
 	}
@@ -49,7 +50,7 @@ void RayTracer::key(unsigned char key, int, int)
 
 			cout << "After:\t" << aa[type].c_str() << endl << endl;
 
-			glutPostRedisplay();
+			OpenGLManager::retraceRequired();
 			break;
 		}
 #ifdef CPP11
@@ -82,7 +83,7 @@ void RayTracer::key(unsigned char key, int, int)
 		case 'r':
 		{
 			cout << "Forcing Redraw..." << endl;
-			glutPostRedisplay();
+			OpenGLManager::retraceRequired();
 			break;
 		}
 		case 'F':
@@ -95,7 +96,7 @@ void RayTracer::key(unsigned char key, int, int)
 			fogEnabled = !fogEnabled;
 
 			cout << "After:\tFog " << (fogEnabled ? "On" : "Off") << endl << endl;
-			glutPostRedisplay();
+			OpenGLManager::retraceRequired();
 			break;
 		}
 		case '[':
@@ -132,7 +133,7 @@ void RayTracer::key(unsigned char key, int, int)
 			if (fogMax > 0) fogMax -= 0.1;
 
 			cout << "After:\tFog Max Strength " << fogMax << endl << endl;
-			if (fogEnabled) glutPostRedisplay();
+			if (fogEnabled) OpenGLManager::retraceRequired();
 			break;
 		}
 		case '.':
@@ -145,7 +146,7 @@ void RayTracer::key(unsigned char key, int, int)
 			if (fogMax < 1) fogMax += 0.1;
 
 			cout << "After:\tFog Max Strength " << fogMax << endl << endl;
-			if (fogEnabled) glutPostRedisplay();
+			if (fogEnabled) OpenGLManager::retraceRequired();
 			break;
 		}
 		case 'Q':
@@ -169,7 +170,7 @@ void RayTracer::key(unsigned char key, int, int)
 			fogColour = colourVals[fogColourPos];
 
 			cout << "After:\tFog Colour " << colours[fogColourPos] << endl << endl;
-			if (fogEnabled) glutPostRedisplay();
+			if (fogEnabled) OpenGLManager::retraceRequired();
 			break;
 		}
 	}
@@ -185,5 +186,5 @@ void RayTracer::controlFogDepth(int *depth, int change, string changeName)
 	if (n >= 0 && n <= 150) *depth = n;
 
 	cout << "After:\tFog " << changeName << " Depth " << *depth << endl << endl;
-	if (fogEnabled) glutPostRedisplay();
+	if (fogEnabled) OpenGLManager::retraceRequired();
 }

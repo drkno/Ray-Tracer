@@ -8,17 +8,18 @@
 #define WINDOW_XPOS 20
 #define WINDOW_YPOS 20
 #define WINDOW_TITLE "Ray Tracer"
-#define CALLBACK_RATE 30
 
 class OpenGLManager
 {
 public:
 	static void run(int argc, char** argv);
+	static void retraceRequired();
 
 private:
+	static bool retrace;
 	static RayTracer* windowRayTracer;
+
 	static void windowDisplayCallback();
-	static void displayRefreshCallback(int);
 	static void windowReshapeCallback(GLint, GLint);
 	static void specialKeypressCallback(int, int, int);
 	static void mouseClickCallback(int, int, int, int);

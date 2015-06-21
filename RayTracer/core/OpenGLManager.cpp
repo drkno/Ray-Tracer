@@ -1,5 +1,6 @@
 #include "OpenGLManager.h"
 
+bool OpenGLManager::retrace = true;
 RayTracer* OpenGLManager::windowRayTracer = NULL;
 
 void OpenGLManager::run(int argc, char* argv[])
@@ -9,6 +10,7 @@ void OpenGLManager::run(int argc, char* argv[])
 	glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 	glutInitWindowPosition(WINDOW_XPOS, WINDOW_YPOS);
 	glutCreateWindow(WINDOW_TITLE);
+	retrace = true;
 	windowRayTracer = new RayTracer();
 	glutReshapeFunc(windowReshapeCallback);
 	glutSpecialFunc(specialKeypressCallback);
@@ -17,10 +19,19 @@ void OpenGLManager::run(int argc, char* argv[])
 	glutDisplayFunc(windowDisplayCallback);
 	glutMainLoop();
 	windowRayTracer->~RayTracer();
+	delete windowRayTracer;
+}
+
+void OpenGLManager::retraceRequired()
+{
+	retrace = true;
+	glutPostRedisplay();
 }
 
 void OpenGLManager::windowDisplayCallback()
 {
+	if (!retrace) return;
+	retrace = false;
 	windowRayTracer->display();
 }
 
