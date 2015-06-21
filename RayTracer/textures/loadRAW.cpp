@@ -5,8 +5,7 @@ Colour* loadRAW(string filename, int width, int height)
 	ifstream file(filename.c_str(), ios::in | ios::binary);
 	if (!file)
 	{
-		cerr << "---------- ERROR ----------" << endl;
-		cerr << "A texture file was missing: \"" << filename << "\"" << endl;
+		cerr << "ERROR: A texture file was missing: \"" << filename << "\"" << endl;
 		cerr << "Please ensure that this file is placed in the appropriate" << endl
 			 << "working directory before retrying to use this application." << endl;
 		cerr << endl << "Critical Error, quitting..." << endl;

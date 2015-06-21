@@ -5,6 +5,10 @@ RayTracer* OpenGLManager::windowRayTracer = NULL;
 
 void OpenGLManager::run(int argc, char* argv[])
 {
+	cout << "Initialisation in Progress" << endl
+		<< "-----------------------------------------------" << endl
+		<< "Please wait...\t" << endl;
+
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
 	glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -16,6 +20,9 @@ void OpenGLManager::run(int argc, char* argv[])
 	glutSpecialFunc(specialKeypressCallback);
 	glutMouseFunc(mouseClickCallback);
 	glutKeyboardFunc(keypressCallback);
+
+	cout << "Complete!" << endl << endl;
+
 	glutDisplayFunc(windowDisplayCallback);
 	glutMainLoop();
 	windowRayTracer->~RayTracer();
