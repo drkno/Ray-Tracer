@@ -50,10 +50,6 @@ void OpenGLManager::windowReshapeCallback(GLint newWidth, GLint newHeight)
 void OpenGLManager::specialKeypressCallback(int key, int x, int y)
 {
 	windowRayTracer->special(key, x, y);
-	if (key == GLUT_KEY_F12)
-	{
-		glutFullScreenToggle();
-	}
 }
 
 void OpenGLManager::keypressCallback(unsigned char key, int x, int y)
