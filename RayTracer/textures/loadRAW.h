@@ -14,7 +14,12 @@
 
 #pragma once
 
+#include <string>
 #include <iostream>
 #include <fstream>
 
-float* loadRAW(std::string filename, int width, int height);
+#include "../types/Colour.h"
+
+using namespace std;
+
+Colour* loadRAW(string filename, int width, int height);

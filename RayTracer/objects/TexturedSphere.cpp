@@ -13,7 +13,7 @@ TexturedSphere::TexturedSphere(Vector c, float r, int width, int height)
 
 TexturedSphere::~TexturedSphere()
 {
-	delete texture;
+	delete [] texture;
 }
 
 Colour TexturedSphere::getColour(Vector pos)
@@ -40,7 +40,7 @@ Colour TexturedSphere::getColour(Vector pos)
 	}
 
 	int xCoord = static_cast<int>((angle / (2.0 * PI)) * width);
-	int index = (xCoord + (yCoord * width)) * 3;
+	int index = (xCoord + (yCoord * width));
 
-	return Colour(texture[index], texture[index + 1], texture[index + 2]);
+	return texture[index];
 }

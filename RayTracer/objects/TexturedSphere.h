@@ -23,7 +23,7 @@ class TexturedSphere : public Sphere
 protected:
     Vector center;
     float radius;
-	float* texture;
+	Colour* texture;
 	double width;
 	double height;
 

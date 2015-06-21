@@ -10,7 +10,7 @@
 class ProcedualSphere : public TexturedSphere
 {
 private:
-	float* generateTexture();
+	Colour* generateTexture();
 
 public:	
 	ProcedualSphere(Vector c, float r);

@@ -1,20 +1,12 @@
-/*----------------------------------------------------------
-* COSC363  Ray Tracer
-*
-*  The color class
-*  A simple colour class with a set of operations including
-*    phong lighting.
--------------------------------------------------------------*/
+#pragma once
 
-#ifndef H_COLOR
-#define H_COLOR
 #include <vector>
 
 class Colour
 {
-
 public:
-    float r, g, b;
+	float r, g, b;
+
 	static const Colour WHITE;
 	static const Colour BLACK;
 	static const Colour RED;
@@ -31,15 +23,10 @@ public:
 	{} ;
 
     void scaleColor(float scaleFactor);
-
     void combineColor(Colour col);
-
     void combineColor(Colour col, float scaleFactor);
-
 	Colour phongLight(Colour ambientCol, float diffuseTerm,  float specularTerm);
-
 	Colour average(std::vector<Colour> colours);
 	const Colour& operator+=(Colour other);
 	const Colour& operator/=(int scale);
 };
-#endif
