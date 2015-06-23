@@ -1,5 +1,5 @@
 # Ray-Tracer
-A ray tracer developed for a COSC363 assignment.
+A multi-threaded ray tracer developed for a COSC363 assignment. Received full marks (A+, 100%).
 
 ## Building
 #### Prerequisites
@@ -30,7 +30,7 @@ CLI arguments are required.
 | [/{    	| Move beginning of fog closer to eye 	|
 | ]/}    	| Move beginning of fog away from eye 	|
 | ;/:    	| Move end of fog closer to eye       	|
-| ë/î    	| Move end of fog away from eye       	|
+| ‚Äò/‚Äù    	| Move end of fog away from eye       	|
 | ,/&lt; 	| Increase fog strength               	|
 | ./&gt; 	| Decrease fog strength               	|
 | ?      	| Cycle fog colour                    	|
